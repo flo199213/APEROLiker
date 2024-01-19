@@ -266,6 +266,7 @@ void Main_Task(void *arg)
     // Abort loop at this point when cleaning mode is active
     if (encoderButton->IsCleaningMode())
     {
+      vTaskDelay(pdMS_TO_TICKS(5));
       continue;
     }
     
