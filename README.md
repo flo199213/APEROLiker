@@ -1,6 +1,11 @@
 # APEROLiker
 Sourcecode for APEROLiker/HUGOliker Devices powered by ESP32S2 (Wemos S2 Mini)
 
+Releases:
+* V1.0 - Features:
+  - Initial Release
+* V1.1 - Features:
+  - Statemachine has been added. A complete display menu is now available. The cleaning mode no longer has to be activated by plugging in the supply voltage while pressing the encoder button but can be called up in the menu.
 
 You can download the 3D print files required for the assembly from Cults.
 
