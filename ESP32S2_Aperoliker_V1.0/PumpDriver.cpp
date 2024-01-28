@@ -113,9 +113,9 @@ void PumpDriver::UpdatePercentages(double pump1_percentage, double pump2_percent
   int pwm3_ms = (int)(pump3_percentage / maxValue * CYCLETIME_MS);
 
   // Optional: Set only percentage values
-  //int pwm1_ms = (int)(CYCLETIME_MS * pump1_percentage / 100.0);
-  //int pwm2_ms = (int)(CYCLETIME_MS * pump2_percentage / 100.0);
-  //int pwm3_ms = (int)(CYCLETIME_MS * pump3_percentage / 100.0);
+  //int pwm1_ms = (int)(pump1_percentage / 100.0 * CYCLETIME_MS);
+  //int pwm2_ms = (int)(pump2_percentage / 100.0 * CYCLETIME_MS);
+  //int pwm3_ms = (int)(pump3_percentage / 100.0 * CYCLETIME_MS);
   
   SetPWM(pwm1_ms, pwm2_ms, pwm3_ms);
 }
