@@ -179,7 +179,7 @@ class DisplayDriver
     void ShowIntroPage();
     
     // Draws cleaning page
-    void ShowCleaningPage();
+    void ShowCleaningPage(bool cleaningAll);
     
     // Draws help page
     void ShowHelpPage();
@@ -198,6 +198,9 @@ class DisplayDriver
 
     // Draws the menu
     void DrawMenu(MixerState menuState, bool isfullUpdate);
+
+    // Draw checkboxes
+    void DrawCheckBoxes(bool cleaningAll);
     
     // Draws the legend
     void DrawLegend();

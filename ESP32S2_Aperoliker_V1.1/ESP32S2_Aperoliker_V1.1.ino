@@ -104,6 +104,9 @@ double liquid1_Percentage = 0;
 double liquid2_Percentage = 0;
 double liquid3_Percentage = 0;
 
+// Cleaning mode settings
+bool cleaningAll = true;
+
 // Manual mode settings
 double liquid1Manual_Percentage = 0;
 double liquid2Manual_Percentage = 0;
@@ -456,6 +459,9 @@ void FctDashboard(MixerEvent event)
           // Draw legend and doughnut chart in partial updating mode
           display->DrawLegend();
           display->DrawDoughnutChart3(false);
+          
+          // Debounce settings change
+          delay(200);
         }
 
         // Check for long button press
@@ -492,7 +498,7 @@ void FctCleaning(MixerEvent event)
 
         // Show cleaning page
         Serial.println("[MAIN] Enter Cleaning Mode");
-        display->ShowCleaningPage();
+        display->ShowCleaningPage(cleaningAll);
 
         // Debounce page change
         delay(500);
@@ -503,6 +509,42 @@ void FctCleaning(MixerEvent event)
       break;
     case eMain:
       {
+        // Check for button press
+        if (encoderButton->IsButtonPress())
+        {
+          // Short beep sound
+          tone(PIN_BUZZER, 500, 40);
+
+          if (cleaningAll)
+          {
+            cleaningAll = false;
+            ChangeSetting();
+          }
+          else
+          {
+            switch (currentSetting)
+            {
+              case eLiquid1:
+                ChangeSetting();
+                break;
+              case eLiquid2:
+                ChangeSetting();
+                break;
+              case eLiquid3:
+              default:
+                cleaningAll = true;
+                break;
+            }
+          }
+          
+          // Update display and pump values
+          UpdateValues();
+          display->DrawCheckBoxes(cleaningAll);
+
+          // Debounce settings change
+          delay(200);
+        }
+
         // Check for long button press
         if (encoderButton->IsLongButtonPress())
         {
@@ -591,6 +633,9 @@ void FctManual(MixerEvent event)
           
           // Draw bargraph in partial updating mode
           display->DrawBargraph();
+          
+          // Debounce settings change
+          delay(200);
         }
 
         // Check for long button press
@@ -736,7 +781,12 @@ void UpdateValues()
       pumps->UpdatePercentages(liquid1_Percentage, liquid2_Percentage, liquid3_Percentage, true);
       break;
     case eCleaning:
-      pumps->UpdatePercentages(100, 100, 100, false); // max value (100%)
+      {
+        double cleaning1_Percentage = cleaningAll || currentSetting == eLiquid1 ? 100.0 : 0.0; // max value (100%) or min value (0%)
+        double cleaning2_Percentage = cleaningAll || currentSetting == eLiquid2 ? 100.0 : 0.0; // max value (100%) or min value (0%)
+        double cleaning3_Percentage = cleaningAll || currentSetting == eLiquid3 ? 100.0 : 0.0; // max value (100%) or min value (0%)
+        pumps->UpdatePercentages(cleaning1_Percentage, cleaning2_Percentage, cleaning3_Percentage, false);
+      }
       break;
     case eManual:
       display->UpdatePercentages(liquid1Manual_Percentage, liquid2Manual_Percentage, liquid3Manual_Percentage);

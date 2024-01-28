@@ -89,16 +89,16 @@ void DisplayDriver::ShowIntroPage()
 //===============================================================
 // Draws cleaning page
 //===============================================================
-void DisplayDriver::ShowCleaningPage()
+void DisplayDriver::ShowCleaningPage(bool cleaningAll)
 {
   // Clear screen
   _tft->fillScreen(TFT_COLOR_BACKGROUND);
   
   // Draw header information
-  DrawHeader();
+  DrawHeader("Cleaning Mode");
 
-  // Draw info box
-  DrawInfoBox("Cleaning mode!", "Long Press: Go Back");
+  // Draw checkboxes
+  DrawCheckBoxes(cleaningAll);
 }
 
 //===============================================================
@@ -290,6 +290,36 @@ void DisplayDriver::DrawMenu(MixerState menuState, bool isfullUpdate)
     // Save last state
     _lastDrawMenuState = menuState;
   }
+}
+
+//===============================================================
+// Draw checkboxes
+//===============================================================
+void DisplayDriver::DrawCheckBoxes(bool cleaningAll)
+{
+  uint16_t boxWidth = 30;
+
+  // Print selection text
+  _tft->setTextColor(TFT_COLOR_FOREGROUND);
+  DrawCenteredString("Select pumps for cleaning:", TFT_WIDTH / 2, TFT_HEIGHT / 3, false, 0);
+
+  // Draw checkboxes
+  _tft->drawRect(TFT_WIDTH * 1 / 7, HEADEROFFSET_Y + TFT_HEIGHT / 3, boxWidth, boxWidth, TFT_COLOR_FOREGROUND);
+  _tft->drawRect(TFT_WIDTH * 3 / 7, HEADEROFFSET_Y + TFT_HEIGHT / 3, boxWidth, boxWidth, TFT_COLOR_FOREGROUND);
+  _tft->drawRect(TFT_WIDTH * 5 / 7, HEADEROFFSET_Y + TFT_HEIGHT / 3, boxWidth, boxWidth, TFT_COLOR_FOREGROUND);
+  
+  // Draw activated checkboxes
+  _tft->fillRect(TFT_WIDTH * 1 / 7 + 4, HEADEROFFSET_Y + TFT_HEIGHT / 3 + 4, boxWidth - 8, boxWidth - 8, cleaningAll || _currentSetting == eLiquid1 ? TFT_COLOR_STARTPAGE : TFT_COLOR_BACKGROUND);
+  _tft->fillRect(TFT_WIDTH * 3 / 7 + 4, HEADEROFFSET_Y + TFT_HEIGHT / 3 + 4, boxWidth - 8, boxWidth - 8, cleaningAll || _currentSetting == eLiquid2 ? TFT_COLOR_STARTPAGE : TFT_COLOR_BACKGROUND);
+  _tft->fillRect(TFT_WIDTH * 5 / 7 + 4, HEADEROFFSET_Y + TFT_HEIGHT / 3 + 4, boxWidth - 8, boxWidth - 8, cleaningAll || _currentSetting == eLiquid3 ? TFT_COLOR_STARTPAGE : TFT_COLOR_BACKGROUND);
+
+  // Draw liquid names
+  _tft->setTextColor(TFT_COLOR_LIQUID_1);
+  DrawCenteredString(liquid1String, TFT_WIDTH * 1 / 7 + boxWidth / 2, HEADEROFFSET_Y + TFT_HEIGHT / 3 + 2 * boxWidth, false, 0);
+  _tft->setTextColor(TFT_COLOR_LIQUID_2);
+  DrawCenteredString(liquid2String, TFT_WIDTH * 3 / 7 + boxWidth / 2, HEADEROFFSET_Y + TFT_HEIGHT / 3 + 2 * boxWidth, false, 0);
+  _tft->setTextColor(TFT_COLOR_LIQUID_3);
+  DrawCenteredString(liquid3String, TFT_WIDTH * 5 / 7 + boxWidth / 2, HEADEROFFSET_Y + TFT_HEIGHT / 3 + 2 * boxWidth, false, 0);
 }
 
 //===============================================================
