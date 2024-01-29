@@ -219,6 +219,9 @@ class DisplayDriver
 
   private:
     Adafruit_ST7789* _tft;
+    SPIFFS_Image _imageBottle;
+    SPIFFS_Image _imageGlass;
+    SPIFFS_Image _imageLogo;
     SPIFFS_ImageReader reader;
 
     bool _spiffsAvailable = false;

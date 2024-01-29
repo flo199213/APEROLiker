@@ -21,14 +21,28 @@ DisplayDriver::DisplayDriver(Adafruit_ST7789* tft) :
 //===============================================================
 void DisplayDriver::Begin()
 {
+  // Initialize SPIFFS
   _spiffsAvailable = SPIFFS.begin();
-
+  
+  // Initialize display
   _tft->init(TFT_WIDTH, TFT_HEIGHT, SPI_MODE3);
   _tft->invertDisplay(true);
   _tft->setRotation(3);
   _tft->setTextWrap(false);
   _tft->setFont(&FreeSans9pt7b);
   _tft->fillScreen(TFT_COLOR_BACKGROUND);
+
+  // Show starting message
+  _tft->setTextColor(TFT_COLOR_FOREGROUND);
+  DrawCenteredString("Booting...", TFT_WIDTH / 2, TFT_HEIGHT / 2, false, 0);
+
+  if (_spiffsAvailable)
+  {
+    // Load startup images to RAM
+    _spiffsAvailable &= reader.LoadBMP(startupImageBottle.c_str(), &_imageBottle) == IMAGE_SUCCESS;
+    _spiffsAvailable &= reader.LoadBMP(startupImageGlass.c_str(), &_imageGlass) == IMAGE_SUCCESS;
+    _spiffsAvailable &= reader.LoadBMP(startupImageLogo.c_str(), &_imageLogo) == IMAGE_SUCCESS;
+  }
 }
 
 //===============================================================
@@ -70,19 +84,15 @@ void DisplayDriver::ShowIntroPage()
 
   if (_spiffsAvailable)
   {
-    // Draw bottle
-    reader.drawBMP(startupImageBottle.c_str(), _tft, TFT_BOTTLE_POS_X, TFT_BOTTLE_POS_Y, TFT_TRANSPARENCY_COLOR);
-
-    // Draw glass
-    reader.drawBMP(startupImageGlass.c_str(), _tft, TFT_GLASS_POS_X, TFT_GLASS_POS_Y, TFT_TRANSPARENCY_COLOR);
-
-    // Draw logo
-    reader.drawBMP(startupImageLogo.c_str(), _tft, TFT_LOGO_POS_X, TFT_LOGO_POS_Y, TFT_TRANSPARENCY_COLOR);
+    // Draw startup images
+    _imageBottle.Draw(TFT_BOTTLE_POS_X, TFT_BOTTLE_POS_Y, _tft, TFT_TRANSPARENCY_COLOR);
+    _imageGlass.Draw(TFT_GLASS_POS_X, TFT_GLASS_POS_Y, _tft, TFT_TRANSPARENCY_COLOR);
+    _imageLogo.Draw(TFT_LOGO_POS_X, TFT_LOGO_POS_Y, _tft, TFT_TRANSPARENCY_COLOR);
   }
   else
   {
     // Draw info box (fallback)
-    DrawInfoBox("- Startpage -", "NO SPIFFS!");
+    DrawInfoBox("- Startpage -", "NO SPIFFS Files!");
   }
 }
 

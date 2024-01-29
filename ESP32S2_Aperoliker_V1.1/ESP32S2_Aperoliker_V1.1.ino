@@ -193,11 +193,11 @@ void setup(void)
   // Initialize pumps driver
   pumps = new PumpDriver(PIN_PUMP_1, PIN_PUMP_2, PIN_PUMP_3);
   pumps->Begin();
-  
+
   // Show intro page
   display->ShowIntroPage();
   delay(3000);
-  
+
   // Set Defaults
   SetMixtureDefaults();
   
