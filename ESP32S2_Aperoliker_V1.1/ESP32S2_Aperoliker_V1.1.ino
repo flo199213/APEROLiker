@@ -163,6 +163,15 @@ void setup(void)
   Serial.begin(115200);
   Serial.println("[SETUP] Aperoliker V1.1");
 
+  // Initialize SPI
+  SPIClass *spi = new SPIClass(HSPI);
+  spi->begin(PIN_TFT_SCL, -1, PIN_TFT_SDA, PIN_TFT_CS);
+
+  // Initialize display
+  tft = new Adafruit_ST7789(spi, PIN_TFT_CS, PIN_TFT_DC, PIN_TFT_RST);
+  display = new DisplayDriver(tft);
+  display->Begin();
+
   // Initialize GPIOs
   pinMode(PIN_PUMPS_ENABLE, INPUT_PULLUP);
   pinMode(PIN_PUMPS_ENABLE_GND, OUTPUT);
@@ -184,15 +193,6 @@ void setup(void)
   // Initialize pumps driver
   pumps = new PumpDriver(PIN_PUMP_1, PIN_PUMP_2, PIN_PUMP_3);
   pumps->Begin();
-    
-  // Initialize SPI
-  SPIClass *spi = new SPIClass(HSPI);
-  spi->begin(PIN_TFT_SCL, -1, PIN_TFT_SDA, PIN_TFT_CS);
-
-  // Initialize display
-  tft = new Adafruit_ST7789(spi, PIN_TFT_CS, PIN_TFT_DC, PIN_TFT_RST);
-  display = new DisplayDriver(tft);
-  display->Begin();
   
   // Show intro page
   display->ShowIntroPage();
