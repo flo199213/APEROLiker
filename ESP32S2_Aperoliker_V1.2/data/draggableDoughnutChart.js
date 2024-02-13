@@ -154,11 +154,11 @@
         // Context draws 0° to the right x-Axis
         // We want to start the chart at the top, so we have to add 90°
         var grabbedAngle90 = normaliseAngle(grabbedAngle + 90.0);
-
-        // Get angle of grabbed target from centre of doughnut in degrees
-        var newAngle = grabbedAngle90 - draggedSegment.angleOffset;
-
-        doughnutchart.ShiftSelectedAngle(newAngle);
+        
+        // Make integer: double to int
+        var grabbedAngle90_int = parseInt(grabbedAngle90, 10);
+        
+        doughnutchart.ShiftSelectedAngle(grabbedAngle90_int);
         doughnutchart.Draw();
       }
       // If there is no dragged segment only draw hover index
@@ -259,7 +259,6 @@
     this.draggedSegment =
     {
       index: index,
-      angleOffset: 0,
       centerX: geometry.centerX,
       centerY: geometry.centerY,
       startingAngles: this.data.map(function (segment)
@@ -346,7 +345,6 @@
     {
       return {
         index: closest.index,
-        angleOffset: smallestSignedAngleBetween(closest.angle, startingAngles[closest.index]),
         centerX: geometry.centerX,
         centerY: geometry.centerY,
         startingAngles: startingAngles,
@@ -404,6 +402,12 @@
       doughnutchart.DrawSegment(context, doughnutchart, geometry, index);
     }
     
+    // Draw each label
+    for (index = 0; index < doughnutchart.data.length; index++)
+    {
+      doughnutchart.DrawLabel(context, doughnutchart, geometry, index);
+    }
+    
     // Draw node if hovered segment
     if (doughnutchart.hoveredIndex !== -1)
     {
@@ -436,97 +440,55 @@
     // Get starting angle of the target
     var startingAngle = draggedSegment.startingAngles[draggedSegment.index];
 
-    // Get previous angle of the target
-    var previousAngle = doughnutchart.data[draggedSegment.index].angle;
-
     // Get diff from grabbed target start (as -180 to +180)
     var angleDragDistance = smallestSignedAngleBetween(newAngle, startingAngle);
-
-    // Get previous diff
-    var previousDragDistance = draggedSegment.angleDragDistance;
-
-    // Determines whether we go clockwise or anticlockwise
-    var rotationDirection = previousDragDistance > 0 ? 1 : -1;
     
     // Set next angle drag distance
     draggedSegment.angleDragDistance = angleDragDistance;
 
     // Set the new angle:
     var newDraggedAngle = normaliseAngle(startingAngle + angleDragDistance);
-
-
-    // Search other angles
-    var minAngle = doughnutchart.minAngle;
+        
+    // Get "previous index" (counter clockwise) and "next index" (clockwise)
+    // Distance to previous
+    var previousIndex = mod(parseInt(draggedSegment.index) - 1, doughnutchart.data.length);
+    var distanceDragToPrevious = smallestSignedAngleBetween(newAngle, draggedSegment.startingAngles[previousIndex]);
+    var angleBorderPrevious = normaliseAngle(draggedSegment.startingAngles[previousIndex] + doughnutchart.minAngle);
     
+    // Distance to next
+    var nextIndex = mod(parseInt(draggedSegment.index) + 1, doughnutchart.data.length);
+    var distanceDragToNext = smallestSignedAngleBetween(newAngle, draggedSegment.startingAngles[nextIndex]);
+    var angleBorderNext = normaliseAngle(draggedSegment.startingAngles[nextIndex] - doughnutchart.minAngle);
     
-    // Index to test each slice in order
-    var nextIndex = mod(parseInt(draggedSegment.index) + rotationDirection, doughnutchart.data.length);
-
-    // Get angle from target start to this angle
-    var newDraggedAngleToNonDragged = smallestSignedAngleBetween(draggedSegment.startingAngles[nextIndex], newDraggedAngle);
-    
-    if (Math.abs(newDraggedAngleToNonDragged) < minAngle)
+    // Determine active border index and angle
+    var realShiftedDistance = 0;
+    if (!isBetween(angleBorderPrevious, newDraggedAngle, angleBorderNext))
     {
-      doughnutchart.data[draggedSegment.index].angle = draggedSegment.startingAngles[nextIndex] - minAngle * rotationDirection;
+      // Determine which border to set the angle to
+      var borderedAngle = Math.abs(distanceDragToNext) < Math.abs(distanceDragToPrevious) ? angleBorderNext : angleBorderPrevious;
+      
+      // Calculate real shifted distance
+      realShiftedDistance = borderedAngle - doughnutchart.data[draggedSegment.index].angle
+      
+      // Set the new angle
+      doughnutchart.data[draggedSegment.index].angle = borderedAngle;
     }
     else
     {
+      // Calculate real shifted distance
+      realShiftedDistance = newDraggedAngle - doughnutchart.data[draggedSegment.index].angle
+      
+      // Set the new angle
       doughnutchart.data[draggedSegment.index].angle = newDraggedAngle;
     }
-/*
-    for (var segmentIndex = 1; segmentIndex < doughnutchart.data.length; segmentIndex++)
-    {
-      // Index to test each slice in order
-      var index = mod(parseInt(draggedSegment.index) + (segmentIndex * rotationDirection), doughnutchart.data.length);
-
-      // Get angle from target start to this angle
-      var startingAngleToNonDragged = smallestSignedAngleBetween(draggedSegment.startingAngles[index], startingAngle);
-
-      // If angle is in the wrong direction then it should actually be OVER 180
-      if (startingAngleToNonDragged * rotationDirection < 0)
-      {
-        startingAngleToNonDragged = ((startingAngleToNonDragged * rotationDirection) + 360.0) * rotationDirection;
-      }
-      
-      if (startingAngleToNonDragged > 0 && angleDragDistance > (startingAngleToNonDragged - minAngle))
-      {
-        // Limit angle to the next angle
-        doughnutchart.data[draggedSegment.index].angle = draggedSegment.startingAngles[index] - minAngle;
-      }
-      else if (startingAngleToNonDragged < 0 && angleDragDistance < (startingAngleToNonDragged + minAngle))
-      {
-        // Limit angle to the previous angle
-        doughnutchart.data[draggedSegment.index].angle = draggedSegment.startingAngles[index] + minAngle;
-      }
-      else
-      {
-        doughnutchart.data[index].angle = draggedSegment.startingAngles[index];
-      }
-
-      // *Shifting behaviour* when smallest angle encountered
-      // Shift all other angles along
-      var shift = (numberOfAnglesShifted + 1) * minAngle;
-
-      if (shifting && startingAngleToNonDragged > 0 && angleDragDistance > (startingAngleToNonDragged - shift))
-      {
-        doughnutchart.data[index].angle = normaliseAngle(draggedSegment.startingAngles[index] + (angleDragDistance - startingAngleToNonDragged) + shift);
-        numberOfAnglesShifted++;
-      }
-      else if (shifting && startingAngleToNonDragged < 0 && angleDragDistance < (startingAngleToNonDragged + shift))
-      {
-        doughnutchart.data[index].angle = normaliseAngle(draggedSegment.startingAngles[index] - (startingAngleToNonDragged - angleDragDistance) - shift);
-        numberOfAnglesShifted++;
-      }
-      else
-      {
-        shifting = false;
-        doughnutchart.data[index].angle = draggedSegment.startingAngles[index];
-      }
-
-      //console.log(JSON.stringify(doughnutchart.data));
-    }*/
     
-    doughnutchart.onshift(draggedSegment.index, angleDragDistance - previousDragDistance);//newAngle - doughnutchart.data[draggedSegment.index].angle);
+    //console.log("Next=" + nextIndex + ", Angle=" + distanceDragToNext + " | Previous=" + previousIndex + ", Angle=" + distanceDragToPrevious);
+    
+    // Check for angle changes
+    if (realShiftedDistance != 0)
+    {
+      doughnutchart.onshift(draggedSegment.index, realShiftedDistance);
+    }
   };
   
   // Draws a single segment
@@ -552,7 +514,17 @@
     context.fillStyle = doughnutchart.data[index].color;
     context.fill();
     context.restore();
+  };
 
+  // Draws a single label
+  DraggableDoughnutchart.prototype.DrawLabel = function (context, doughnutchart, geometry, index)
+  {
+    var startingAngle = doughnutchart.data[index].angle;
+    
+    // Context draws 0° to the right x-Axis
+    // We want to start the chart at the top, so we have to subtract 90°
+    var startingAngle90 = normaliseAngle(startingAngle - 90.0);
+    
     // Draw label on top (context.rotate() uses angle in rad)
     context.save();
     context.translate(geometry.centerX, geometry.centerY);
@@ -567,7 +539,7 @@
     context.fillText(doughnutchart.data[index].label, dx, dy);
     context.restore();
   };
-  
+
   // Draws a single segment
   DraggableDoughnutchart.prototype.DrawNode = function (context, doughnutchart, geometry, index)
   {
@@ -659,6 +631,7 @@
     return mod(angle, 360);
   };
 
+  // Returns cartesian coordinates from angle and radius
   function polarToCartesian(angle, radius)
   {
     return {
@@ -666,4 +639,18 @@
       y: radius * Math.sin(degreesToRadians(angle))
     }
   };
+  
+  // Returns true, if angle is between previous angle and next angle
+  function isBetween(previousAngle, angle, nextAngle)
+  {
+    var distToZero = 360 - previousAngle;
+    
+    var tempPreviousAngle = normaliseAngle(previousAngle + distToZero);
+    var tempAngle = normaliseAngle(angle + distToZero);
+    var tempNextAngle = normaliseAngle(nextAngle + distToZero);
+    
+    return tempPreviousAngle < tempAngle && tempAngle < tempNextAngle;
+    
+  };
+  
 })();
