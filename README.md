@@ -12,7 +12,10 @@ Releases:
   - Initial Release
 * V1.1 - Features:
   - Statemachine has been added. A complete display menu is now available. The cleaning mode no longer has to be activated by plugging in the supply voltage while pressing the encoder button but can be called up in the menu.
-<img src="Images/Aperoliker_NewModes_WithMenu.jpg" width="450">
+  <img src="Images/Aperoliker_NewModes_WithMenu.jpg" width="450">
+* V1.2 - Features:
+  - Wifi is now available! You can control the Aperoliker via access point. I will show a homepage under "aperoliker.local" or "hugoliker.local". Additionally, you now can use the SPIFFS Uploader to upload the image and webpage files. Statemachine and some other firmware parts were moved to separate files.
+  <img src="Images/AperolikerHugoliker_PageSmall.jpg" width="450">
 
 ___
 
