@@ -692,9 +692,9 @@ void StateMachine::UpdateValues(uint32_t clientID)
       break;
     case eCleaning:
       {
-        bool cleaningLiquid1_Percentage = _cleaningLiquid == eLiquidAll || _cleaningLiquid == eLiquid1 ? 100.0 : 0.0;
-        bool cleaningLiquid2_Percentage = _cleaningLiquid == eLiquidAll || _cleaningLiquid == eLiquid2 ? 100.0 : 0.0;
-        bool cleaningLiquid3_Percentage = _cleaningLiquid == eLiquidAll || _cleaningLiquid == eLiquid3 ? 100.0 : 0.0;
+        double cleaningLiquid1_Percentage = (_cleaningLiquid == eLiquidAll || _cleaningLiquid == eLiquid1) ? 100.0 : 0.0;
+        double cleaningLiquid2_Percentage = (_cleaningLiquid == eLiquidAll || _cleaningLiquid == eLiquid2) ? 100.0 : 0.0;
+        double cleaningLiquid3_Percentage = (_cleaningLiquid == eLiquidAll || _cleaningLiquid == eLiquid3) ? 100.0 : 0.0;
         Pumps.SetPumps(cleaningLiquid1_Percentage, cleaningLiquid2_Percentage, cleaningLiquid3_Percentage);
       }
       break;
