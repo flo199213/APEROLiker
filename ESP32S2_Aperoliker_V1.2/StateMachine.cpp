@@ -1,4 +1,3 @@
-#include "esp_wifi_types.h"
 /**
  * Includes all state machine functions
  *

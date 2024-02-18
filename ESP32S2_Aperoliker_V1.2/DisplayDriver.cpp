@@ -1,4 +1,3 @@
-#include "xtensa/config/core-isa.h"
 /**
  * Includes all display functions
  *
