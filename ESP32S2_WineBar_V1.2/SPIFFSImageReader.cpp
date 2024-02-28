@@ -69,6 +69,25 @@ void SPIFFSImage::Draw(int16_t x, int16_t y, Adafruit_SPITFT *tft, uint16_t tran
 }
 
 //===============================================================
+// Return a pixel at the requested position
+//===============================================================
+uint16_t SPIFFSImage::GetPixel(int16_t x, int16_t y)
+{
+  uint16_t* buffer = Canvas16->getBuffer();
+  int16_t h = Canvas16->height();
+  int16_t w = Canvas16->width();
+
+  int16_t index = y * w + x;
+
+  if (index < w * h)
+  {
+    return buffer[index];
+  }
+  
+  return 0;
+}
+
+//===============================================================
 // Constructor
 //===============================================================
 SPIFFSImageReader::SPIFFSImageReader()

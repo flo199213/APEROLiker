@@ -29,6 +29,9 @@ class PumpDriver
     // Initializes the pump driver
     void Begin(uint8_t pinPump1, uint8_t pinPump2, uint8_t pinPump3);
     
+    // Return the timestamp of the last user action
+    uint32_t GetLastUserAction();
+
     // Enables pump output
     void IRAM_ATTR Enable();
     
@@ -59,6 +62,9 @@ class PumpDriver
     bool _enablePump1 = false;
     bool _enablePump2 = false;
     bool _enablePump3 = false;
+    
+    // Timestamp of last user action
+    uint32_t _lastUserAction = 0;
 
     // Disables pump output (internal)
     void DisableInternal();

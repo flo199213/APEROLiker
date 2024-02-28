@@ -44,6 +44,9 @@ class SPIFFSImage
     
     // Draws the canvas on the tft
     void Draw(int16_t x, int16_t y, Adafruit_SPITFT *tft, uint16_t transparencyColor);
+
+    // Return a pixel at the requested position
+    uint16_t GetPixel(int16_t x, int16_t y);
     
     // Canvas which stores the pixel data
     GFXcanvas16* Canvas16;

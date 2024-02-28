@@ -60,6 +60,7 @@
 #define LOONGLINEOFFSET             50
 #define SPACERANGLE_DEGREES         1  // Angle which will be displayed as spacer between pie elements (will be multiplied by 2, left and right of the setting angle)
 
+#define SCREENSAVER_STARCOUNT       30
 
 //===============================================================
 // Icons
@@ -161,6 +162,18 @@ const unsigned char icon_copyright [] PROGMEM = {
 	0x18, 0x80, 0x01, 0x70, 0xe0, 0x00, 0xe0, 0x7f, 0x00, 0x80, 0x1f, 0x00
 };
 
+//===============================================================
+// Class for screen saver stars
+//===============================================================
+class Star
+{
+  public:
+    int16_t X = 0;
+    int16_t Y = 0;
+    int16_t Size = 5;
+    int16_t MaxSize = 0;
+    bool FullStars = false;
+};
 
 //===============================================================
 // Class for handling display functions
@@ -207,6 +220,9 @@ class DisplayDriver
     // Shows settings page
     void ShowSettingsPage();
 
+    // Shows screen saver page
+    void ShowScreenSaverPage();
+    
     // Draws the Wifi icon
     void DrawWifiIcons();
     
@@ -233,6 +249,9 @@ class DisplayDriver
 
     // Draws settings partially
     void DrawSettings(bool isfullUpdate = false);
+
+    // Draws screen saver
+    void DrawScreenSaver();
 
   private:
     // Display variable
@@ -270,7 +289,13 @@ class DisplayDriver
     String _lastDraw_Liquid3String = "";
     uint32_t _lastDraw_cycleTimespan_ms = 0;
     wifi_mode_t _lastDraw_wifiMode = WIFI_MODE_NULL;
-    uint16_t _lastDraw_ConnectedClients = 0;
+
+    // Screen saver variables
+    Star _stars[SCREENSAVER_STARCOUNT];
+    int16_t _lastLogo_x = 10;
+    int16_t _lastLogo_y = TFT_HEIGHT / 2;
+    int16_t _xDir = 1;
+    int16_t _yDir = 1;
 
     // Draws default header Text
     void DrawHeader();
@@ -289,6 +314,12 @@ class DisplayDriver
     
     // Formats double value
     String FormatValue(double value, int mainPlaces, int decimalPlaces);
+
+    // Draws a star
+    void DrawStar(int16_t x0, int16_t y0, bool fullStars, uint16_t color, int16_t size = 0);
+    
+    // Draws a star tail
+    void DrawStarTail(int16_t x0, int16_t y0, int16_t start, int16_t end, bool fullStars, uint16_t color);
 };
 
 

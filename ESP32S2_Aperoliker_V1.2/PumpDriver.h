@@ -38,6 +38,9 @@ class PumpDriver
 
     // Initializes the pump driver
     void Begin(uint8_t pinPump1, uint8_t pinPump2, uint8_t pinPump3);
+
+    // Return the timestamp of the last user action
+    uint32_t GetLastUserAction();
     
     // Load settings from EEPROM
     void Load();
@@ -87,6 +90,9 @@ class PumpDriver
     bool _lastEnablePump2 = false;
     bool _lastEnablePump3 = false;
     uint32_t _lastPumpCycleStart_ms = 0;
+    
+    // Timestamp of last user action
+    uint32_t _lastUserAction = 0;
 
     // Disables pump output (internal)
     void DisableInternal();

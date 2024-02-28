@@ -32,6 +32,17 @@ void PumpDriver::Begin(uint8_t pinPump1, uint8_t pinPump2, uint8_t pinPump3)
 
   // Disable pump output
   DisableInternal();
+
+  // Reset timestamp of last user action
+  _lastUserAction = millis();
+}
+
+//===============================================================
+// Return the timestamp of the last user action
+//===============================================================
+uint32_t PumpDriver::GetLastUserAction()
+{
+  return _lastUserAction;
 }
 
 //===============================================================
@@ -52,6 +63,9 @@ void PumpDriver::Enable()
   // Set enabled flag to true
   // -> Update function is unlocked
   _isPumpEnabled = true;
+
+  // Set timestamp of last user action
+  _lastUserAction = millis();
 }
 
 //===============================================================
@@ -69,6 +83,9 @@ void PumpDriver::Disable()
   _isPumpEnabled = false;
 
   DisableInternal();
+
+  // Set timestamp of last user action
+  _lastUserAction = millis();
 }
 
 //===============================================================

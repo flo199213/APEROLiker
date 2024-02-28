@@ -34,6 +34,17 @@ void EncoderButtonDriver::Begin(uint8_t pinEncoderOutA, uint8_t pinEncoderOutB, 
   pinMode(_pinEncoderOutA, INPUT_PULLUP);
   pinMode(_pinEncoderOutB, INPUT_PULLUP);
   pinMode(_pinEncoderButton, INPUT_PULLUP);
+  
+  // Reset timestamp of last user action
+  _lastUserAction = millis();
+}
+
+//===============================================================
+// Return the timestamp of the last user action
+//===============================================================
+uint32_t EncoderButtonDriver::GetLastUserAction()
+{
+  return _lastUserAction;
 }
 
 //===============================================================
@@ -48,6 +59,9 @@ bool EncoderButtonDriver::IsButtonPress()
   {
     // Debounce
     delay(100);
+    
+    // Set timestamp of last user action
+    _lastUserAction = millis();
   }
 
   // Reset button press flag
@@ -76,6 +90,9 @@ bool EncoderButtonDriver::IsLongButtonPress()
     // Suppress upcoming next short button press (Long button press appears while pressing
     // the button. Next button press release is therefore no short button press)
     _suppressShortButtonPress = true;
+    
+    // Set timestamp of last user action
+    _lastUserAction = millis();
   }
   
   // Return result
@@ -93,6 +110,12 @@ int16_t EncoderButtonDriver::GetEncoderIncrements()
   
   // Reset the counter
   _encoderIncrements = 0;
+
+  if (currentEncoderIncrements != 0)
+  {
+    // Set timestamp of last user action
+    _lastUserAction = millis();
+  }
 
   // Return increments
   return currentEncoderIncrements;

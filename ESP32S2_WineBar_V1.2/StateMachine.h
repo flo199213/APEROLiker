@@ -23,6 +23,12 @@
 
 
 //===============================================================
+// Defines
+//===============================================================
+#define SCREENSAVER_TIMEOUT_MS      30000     // 30 seconds
+
+
+//===============================================================
 // Class for state machine handling
 //===============================================================
 class StateMachine
@@ -46,6 +52,7 @@ class StateMachine
 
     // State machine variables
     MixerState _currentState = eDashboard;
+    MixerState _lastState = eDashboard;
     MixerState _currentMenuState = eDashboard;
 
     // Dashboard mode settings
@@ -75,6 +82,9 @@ class StateMachine
 
     // Function settings state
     void FctSettings(MixerEvent event);
+
+    // Function screen saver state
+    void FctScreenSaver(MixerEvent event);
     
     // Resets the mixture to default recipe
     void SetMixtureDefaults();

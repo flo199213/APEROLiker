@@ -228,6 +228,9 @@ void StateMachine::Execute(MixerEvent event)
     case eSettings:
       FctSettings(event);
       break;
+    case eScreenSaver:
+      FctScreenSaver(event);
+      break;
   }
 
   // Check connected clients and draw icons on top
@@ -306,6 +309,17 @@ void StateMachine::FctMenu(MixerEvent event)
           // Exit menu and enter new selected mode
           Execute(eExit);
           _currentState = _currentMenuState;
+          Execute(eEntry);
+        }
+
+        // Check for screen saver timeout
+        if (millis() - EncoderButton.GetLastUserAction() > SCREENSAVER_TIMEOUT_MS &&
+          millis() - Pumps.GetLastUserAction() > SCREENSAVER_TIMEOUT_MS)
+        {
+          // Exit menu mode and enter screen saver mode
+          Execute(eExit);
+          _lastState = eMenu;
+          _currentState = eScreenSaver;
           Execute(eEntry);
         }
       }
@@ -405,6 +419,17 @@ void StateMachine::FctDashboard(MixerEvent event)
           _currentMenuState = eDashboard;
           Execute(eEntry);
         }
+
+        // Check for screen saver timeout
+        if (millis() - EncoderButton.GetLastUserAction() > SCREENSAVER_TIMEOUT_MS &&
+          millis() - Pumps.GetLastUserAction() > SCREENSAVER_TIMEOUT_MS)
+        {
+          // Exit dashboard mode and enter screen saver mode
+          Execute(eExit);
+          _lastState = eDashboard;
+          _currentState = eScreenSaver;
+          Execute(eEntry);
+        }
       }
       break;
     case eExit:
@@ -468,6 +493,17 @@ void StateMachine::FctCleaning(MixerEvent event)
           Execute(eExit);
           _currentState = eMenu;
           _currentMenuState = eCleaning;
+          Execute(eEntry);
+        }
+        
+        // Check for screen saver timeout
+        if (millis() - EncoderButton.GetLastUserAction() > SCREENSAVER_TIMEOUT_MS &&
+          millis() - Pumps.GetLastUserAction() > SCREENSAVER_TIMEOUT_MS)
+        {
+          // Exit cleaning mode and enter screen saver mode
+          Execute(eExit);
+          _lastState = eCleaning;
+          _currentState = eScreenSaver;
           Execute(eEntry);
         }
       }
@@ -534,7 +570,7 @@ void StateMachine::FctSettings(MixerEvent event)
         // Update display and pump values
         UpdateValues();
 
-        // Show manual page
+        // Show settings page
         Serial.println("[MAIN] Enter Settings Mode");
         Display.ShowSettingsPage();
         
@@ -591,6 +627,17 @@ void StateMachine::FctSettings(MixerEvent event)
           _currentMenuState = eSettings;
           Execute(eEntry);
         }
+
+        // Check for screen saver timeout
+        if (millis() - EncoderButton.GetLastUserAction() > SCREENSAVER_TIMEOUT_MS &&
+          millis() - Pumps.GetLastUserAction() > SCREENSAVER_TIMEOUT_MS)
+        {
+          // Exit settings mode and enter screen saver mode
+          Execute(eExit);
+          _lastState = eSettings;
+          _currentState = eScreenSaver;
+          Execute(eEntry);
+        }
       }
       break;
     case eExit:
@@ -599,6 +646,52 @@ void StateMachine::FctSettings(MixerEvent event)
         Wifihandler.Save();
       }
       break;
+    default:
+      break;
+  }
+}
+
+//===============================================================
+// Function screen saver state
+//===============================================================
+void StateMachine::FctScreenSaver(MixerEvent event)
+{
+  switch(event)
+  {
+    case eEntry:
+      {
+        // Update display and pump values
+        UpdateValues();
+        
+        // Show page
+        Serial.println("[MAIN] Enter Screen Saver Mode");
+        Display.ShowScreenSaverPage();
+        
+        // Reset and ignore user input
+        EncoderButton.GetEncoderIncrements();
+        EncoderButton.IsLongButtonPress(); 
+        EncoderButton.IsButtonPress();
+      }
+      break;
+    case eMain:
+      {
+        // Draw screen saver
+        Display.DrawScreenSaver();
+        
+        // Check for user input
+        if (EncoderButton.GetEncoderIncrements() != 0 ||
+          EncoderButton.IsLongButtonPress() ||
+          EncoderButton.IsButtonPress() ||
+          Pumps.IsEnabled())
+        {
+          // Exit screen saver mode and return to last mode
+          Execute(eExit);
+          _currentState = _lastState;
+          Execute(eEntry);
+        }
+      }
+      break;
+    case eExit:
     default:
       break;
   }

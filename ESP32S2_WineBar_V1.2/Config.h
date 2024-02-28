@@ -44,6 +44,7 @@ enum MixerState : uint16_t
   eCleaning = 2,
   eReset = 3,
   eSettings = 4,
+  eScreenSaver = 5,
 };
 
 enum MixerEvent : uint16_t

@@ -127,7 +127,7 @@ void DisplayDriver::ShowIntroPage()
     // Free memory
     delete _imageBottle;
     delete _imageGlass;
-    delete _imageLogo;
+    //delete _imageLogo; // Do NOT delete logo image for usage with screen saver!
   }
   else
   {
@@ -309,6 +309,18 @@ void DisplayDriver::ShowSettingsPage()
   _tft->print("2024 F.Stablein");
   _tft->drawRect(x + 105, y + 2, 2, 2, TFT_COLOR_TEXT_BODY);  // Stablein with two dots -> Stäblein
   _tft->drawRect(x + 109, y + 2, 2, 2, TFT_COLOR_TEXT_BODY);  // Stablein with two dots -> Stäblein
+}
+
+//===============================================================
+// Shows screen saver page
+//===============================================================
+void DisplayDriver::ShowScreenSaverPage()
+{
+  // Clear screen
+  _tft->fillScreen(TFT_COLOR_BACKGROUND);
+
+  // Draw inital screen saver
+  DrawScreenSaver();
 }
 
 //===============================================================
@@ -815,6 +827,169 @@ void DisplayDriver::DrawSettings(bool isfullUpdate)
     _tft->print(wifiMode == WIFI_MODE_AP ? "AP" : "OFF");
     
     _lastDraw_wifiMode = wifiMode;
+  }
+}
+
+//===============================================================
+// Draws screen saver
+//===============================================================
+void DisplayDriver::DrawScreenSaver()
+{
+  int16_t logoWidth = _imagesAvailable == IMAGE_SUCCESS ? _imageLogo->Canvas16->width() : 0;
+  int16_t logoHeight = _imagesAvailable == IMAGE_SUCCESS ? _imageLogo->Canvas16->height() : 0;
+  
+  // Move logo
+  int16_t logo_x = _lastLogo_x + _xDir;
+  int16_t logo_y = _lastLogo_y + _yDir;
+
+  // Impact collision with the left or right edge
+  if (logo_x <= -logoWidth / 2 || logo_x >= TFT_WIDTH - logoWidth / 2)
+  {
+    _xDir = -_xDir;
+  }
+
+  // Impact collision with the top or bottom edge
+  if (logo_y <= -logoHeight / 2 || logo_y >= TFT_HEIGHT - logoHeight / 2)
+  {
+    _yDir = -_yDir;
+  }
+
+  // Move logo if image and new location is available
+  if (_imagesAvailable == IMAGE_SUCCESS)
+  {
+    // Clear old logo (only diff to new one, to avoid flickering)
+    for (int16_t indexY = 0; indexY < logoHeight; indexY++)
+    {
+      for (int16_t indexX = 0; indexX < logoWidth; indexX++)
+      {
+        // Get old color value at indexX, indexY
+        uint16_t colorOld = _imageLogo->GetPixel(indexX, indexY);
+
+        // Calculate new color value at indexX, indexY
+        int16_t newIndexX = indexX + (_lastLogo_x - logo_x);
+        int16_t newIndexY = indexY + (_lastLogo_y - logo_y);
+        
+        uint16_t colorNew = TFT_TRANSPARENCY_COLOR;
+        if (newIndexX < logoWidth && newIndexY < logoHeight)
+        {
+          colorNew = _imageLogo->GetPixel(newIndexX, newIndexY);
+        }
+        
+        // Reset pixel only if the color would be transparent and old color was not
+        if (colorOld != TFT_TRANSPARENCY_COLOR &&
+          colorNew == TFT_TRANSPARENCY_COLOR)
+        {
+          _tft->writePixel(_lastLogo_x + indexX, _lastLogo_y + indexY, TFT_COLOR_BACKGROUND);
+        }
+      }
+    }
+
+    // Draw logo image
+    _imageLogo->Draw(logo_x, logo_y, _tft, TFT_TRANSPARENCY_COLOR);
+  }
+
+  // Draw stars
+  for (int index = 0; index < SCREENSAVER_STARCOUNT; index++)
+  {
+    // Init new star, if star animation finished
+    if (_stars[index].Size >= _stars[index].MaxSize)
+    {
+      // Clear old star only outside of the logo
+      if (_imagesAvailable != IMAGE_SUCCESS ||
+        !(_stars[index].X > logo_x &&
+        _stars[index].X < logo_x + logoWidth &&
+        _stars[index].Y > logo_y &&
+        _stars[index].Y < logo_y + logoHeight &&
+        _imageLogo->GetPixel(_stars[index].X - logo_x, _stars[index].Y - logo_y) != TFT_TRANSPARENCY_COLOR))
+      {
+        DrawStar(_stars[index].X, _stars[index].Y, _stars[index].FullStars, TFT_COLOR_BACKGROUND, _stars[index].Size);
+      }
+
+      _stars[index].X = random(0, TFT_WIDTH);
+      _stars[index].Y = random(0, TFT_HEIGHT);
+      _stars[index].MaxSize = random(1, 6);
+      _stars[index].FullStars = random(0, 12) < 6 ? true : false;
+      _stars[index].Size = 0;
+    }
+
+    // Draw new star only outside of the logo
+    if (_imagesAvailable != IMAGE_SUCCESS || 
+      !(_stars[index].X > logo_x &&
+      _stars[index].X < logo_x + logoWidth &&
+      _stars[index].Y > logo_y &&
+      _stars[index].Y < logo_y + logoHeight &&
+      _imageLogo->GetPixel(_stars[index].X - logo_x, _stars[index].Y - logo_y) != TFT_TRANSPARENCY_COLOR))
+    {
+      DrawStar(_stars[index].X, _stars[index].Y, _stars[index].FullStars, TFT_COLOR_FOREGROUND, _stars[index].Size);
+    }
+
+    // Increment star size
+    _stars[index].Size++;
+  }
+
+  _lastLogo_x = logo_x;
+  _lastLogo_y = logo_y;
+}
+
+//===============================================================
+// Draws a star
+//===============================================================
+void DisplayDriver::DrawStar(int16_t x0, int16_t y0, bool fullStars, uint16_t color, int16_t size)
+{
+  _tft->writePixel(x0, y0, color);
+
+  if (size > 0)
+  {
+    DrawStarTail(x0, y0, 1, 2, fullStars, color);
+  }
+  if (size > 1)
+  {
+    DrawStarTail(x0, y0, 4, 5, fullStars, color);
+  }
+  if (size > 2)
+  {
+    DrawStarTail(x0, y0, 7, 8, fullStars, color);
+  }
+  if (size > 3)
+  {
+    DrawStarTail(x0, y0, 10, 11, fullStars, color);
+  }
+  if (size > 4)
+  {
+    DrawStarTail(x0, y0, 13, 14, fullStars, color);
+  }
+}
+
+//===============================================================
+// Draws a star tail
+//===============================================================
+void DisplayDriver::DrawStarTail(int16_t x0, int16_t y0, int16_t start, int16_t end, bool fullStars, uint16_t color)
+{
+  // Nach oben
+  _tft->writeLine(x0, y0 - start, x0, y0 - end, color);
+
+  // Nach unten
+  _tft->writeLine(x0, y0 + start, x0, y0 + end, color);
+
+  // Nach rechts
+  _tft->writeLine(x0 + start, y0, x0 + end, y0, color);
+
+  // Nach links
+  _tft->writeLine(x0 - start, y0, x0 - end, y0, color);
+
+  if (fullStars)
+  {
+    // Nach rechts oben
+    _tft->writeLine(x0 + start, y0 - start, x0 + end, y0 - end, color);
+
+    // Nach links oben
+    _tft->writeLine(x0 - start, y0 - start, x0 - end, y0 - end, color);
+
+    // Nach rechts unten
+    _tft->writeLine(x0 + start, y0 + start, x0 + end, y0 + end, color);
+
+    // Nach links unten
+    _tft->writeLine(x0 - start, y0 + start, x0 - end, y0 + end, color);
   }
 }
 
