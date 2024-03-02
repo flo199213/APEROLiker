@@ -14,6 +14,7 @@
  * - USB DFU On Boot: "Disabled"
  * - USB Firmware MSC On Boot: "Disabled"
  * - Flash Size: "4Mb (32Mb)"
+ * - Partition Scheme: "No OTA (2MB APP/2MB SPIFFS)"
  * - PSRAM: "Enabled"
  * - Upload Mode: "Internal USB"
  * - Upload Speed: "921600"

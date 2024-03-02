@@ -236,6 +236,8 @@ void StateMachine::Execute(MixerEvent event)
   // Check connected clients and draw icons on top
   uint16_t connectedClients = Wifihandler.GetConnectedClients();
   if (_lastConnectedClients != connectedClients)
+  if (_lastConnectedClients != connectedClients &&
+    _currentState != eScreenSaver)
   {
     _lastConnectedClients = connectedClients;
     Display.DrawWifiIcons();
