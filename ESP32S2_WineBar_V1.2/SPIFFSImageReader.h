@@ -41,17 +41,26 @@ class SPIFFSImage
     
     // Destructor
     ~SPIFFSImage();
+
+    // Return the height of the image
+    int16_t Height() { return Canvas16->height(); }
+
+    // Return the width of the image
+    int16_t Width() { return Canvas16->width(); }
     
     // Draws the canvas on the tft
     void Draw(int16_t x, int16_t y, Adafruit_SPITFT *tft, uint16_t transparencyColor);
 
+    // Moves the canvas on the tft
+    void Move(int16_t x0, int16_t y0, int16_t x1, int16_t y1, Adafruit_SPITFT *tft, uint16_t clearColor, uint16_t transparencyColor);
+
     // Return a pixel at the requested position
     uint16_t GetPixel(int16_t x, int16_t y);
-    
+
+  private:
     // Canvas which stores the pixel data
     GFXcanvas16* Canvas16;
 
-  private:
     // Free/deinitializes variables
     void Dealloc();      
 

@@ -49,16 +49,16 @@ void SPIFFSImage::Dealloc()
 void SPIFFSImage::Draw(int16_t x, int16_t y, Adafruit_SPITFT *tft, uint16_t transparencyColor)
 {
   uint16_t* buffer = Canvas16->getBuffer();
-  int16_t h = Canvas16->height();
-  int16_t w = Canvas16->width();
+  int16_t height = Canvas16->height();
+  int16_t width = Canvas16->width();
 
   // Write pixels
   tft->startWrite();
-  for (int16_t row = 0; row < h; row++)
+  for (int16_t row = 0; row < height; row++)
   {
-    for (int16_t column = 0; column < w; column++)
+    for (int16_t column = 0; column < width; column++)
     {
-      uint16_t currentPixel = buffer[row * w + column];
+      uint16_t currentPixel = buffer[row * width + column];
       if (currentPixel != transparencyColor)
       {
         tft->writePixel(x + column, y + row, currentPixel);
@@ -69,17 +69,61 @@ void SPIFFSImage::Draw(int16_t x, int16_t y, Adafruit_SPITFT *tft, uint16_t tran
 }
 
 //===============================================================
+// Moves the canvas on the tft
+//===============================================================
+void SPIFFSImage::Move(int16_t x0, int16_t y0, int16_t x1, int16_t y1, Adafruit_SPITFT *tft, uint16_t clearColor, uint16_t transparencyColor)
+{
+  uint16_t* buffer = Canvas16->getBuffer();
+  int16_t height = Canvas16->height();
+  int16_t width = Canvas16->width();
+
+  // Clear old image (only diff to new one, to avoid flickering)
+  tft->startWrite();
+  for (int16_t row = 0; row < height; row++)
+  {
+    for (int16_t column = 0; column < width; column++)
+    {
+      // Get old color value
+      uint16_t colorOld = buffer[row * width + column];
+
+      // Calculate new color indexes
+      int16_t newColumn = column - (x1 - x0);
+      int16_t newRow = row - (y1 - y0);
+      
+      // Get new color value
+      uint16_t colorNew = transparencyColor;
+      if (newColumn > 0 && newColumn < width &&
+        newRow > 0 && newRow < height)
+      {
+        colorNew = buffer[newRow * width + newColumn];
+      }
+      
+      // Reset pixel only if the color would be transparent and old color was not
+      if (colorOld != transparencyColor &&
+        colorNew == transparencyColor)
+      {
+        tft->writePixel(x0 + column, y0 + row, clearColor);
+      }
+    }
+  }
+  tft->endWrite();
+
+  // Draw new (moved) image
+  Draw(x1, y1, tft, transparencyColor);
+}
+
+//===============================================================
 // Return a pixel at the requested position
 //===============================================================
 uint16_t SPIFFSImage::GetPixel(int16_t x, int16_t y)
 {
   uint16_t* buffer = Canvas16->getBuffer();
-  int16_t h = Canvas16->height();
-  int16_t w = Canvas16->width();
+  int16_t height = Canvas16->height();
+  int16_t width = Canvas16->width();
 
-  int16_t index = y * w + x;
+  int16_t index = y * width + x;
 
-  if (index < w * h)
+  if (index < width * height)
   {
     return buffer[index];
   }

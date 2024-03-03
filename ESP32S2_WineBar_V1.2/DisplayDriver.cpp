@@ -561,12 +561,19 @@ void DisplayDriver::DrawSettings(bool isfullUpdate)
 //===============================================================
 void DisplayDriver::DrawScreenSaver()
 {
-  int16_t logoWidth = _imagesAvailable == IMAGE_SUCCESS ? _imageLogo->Canvas16->width() : 0;
-  int16_t logoHeight = _imagesAvailable == IMAGE_SUCCESS ? _imageLogo->Canvas16->height() : 0;
+  bool hasLogo = _imagesAvailable == IMAGE_SUCCESS;
+  int16_t logoWidth = hasLogo ? _imageLogo->Width() : 0;
+  int16_t logoHeight = hasLogo ? _imageLogo->Height() : 0;
   
-  // Move logo
+  // Move logo indexes
   int16_t logo_x = _lastLogo_x + _xDir;
   int16_t logo_y = _lastLogo_y + _yDir;
+  
+  // Move logo if image is available
+  if (hasLogo)
+  {
+    _imageLogo->Move(_lastLogo_x, _lastLogo_y, logo_x, logo_y, _tft, TFT_COLOR_BACKGROUND, TFT_TRANSPARENCY_COLOR);
+  }
 
   // Impact collision with the left or right edge
   if (logo_x <= -logoWidth / 2 || logo_x >= TFT_WIDTH - logoWidth / 2)
@@ -580,40 +587,6 @@ void DisplayDriver::DrawScreenSaver()
     _yDir = -_yDir;
   }
 
-  // Move logo if image and new location is available
-  if (_imagesAvailable == IMAGE_SUCCESS)
-  {
-    // Clear old logo (only diff to new one, to avoid flickering)
-    for (int16_t indexY = 0; indexY < logoHeight; indexY++)
-    {
-      for (int16_t indexX = 0; indexX < logoWidth; indexX++)
-      {
-        // Get old color value at indexX, indexY
-        uint16_t colorOld = _imageLogo->GetPixel(indexX, indexY);
-
-        // Calculate new color value at indexX, indexY
-        int16_t newIndexX = indexX + (_lastLogo_x - logo_x);
-        int16_t newIndexY = indexY + (_lastLogo_y - logo_y);
-        
-        uint16_t colorNew = TFT_TRANSPARENCY_COLOR;
-        if (newIndexX < logoWidth && newIndexY < logoHeight)
-        {
-          colorNew = _imageLogo->GetPixel(newIndexX, newIndexY);
-        }
-        
-        // Reset pixel only if the color would be transparent and old color was not
-        if (colorOld != TFT_TRANSPARENCY_COLOR &&
-          colorNew == TFT_TRANSPARENCY_COLOR)
-        {
-          _tft->writePixel(_lastLogo_x + indexX, _lastLogo_y + indexY, TFT_COLOR_BACKGROUND);
-        }
-      }
-    }
-
-    // Draw logo image
-    _imageLogo->Draw(logo_x, logo_y, _tft, TFT_TRANSPARENCY_COLOR);
-  }
-
   // Draw stars
   for (int index = 0; index < SCREENSAVER_STARCOUNT; index++)
   {
@@ -621,11 +594,9 @@ void DisplayDriver::DrawScreenSaver()
     if (_stars[index].Size >= _stars[index].MaxSize)
     {
       // Clear old star only outside of the logo
-      if (_imagesAvailable != IMAGE_SUCCESS ||
-        !(_stars[index].X > logo_x &&
-        _stars[index].X < logo_x + logoWidth &&
-        _stars[index].Y > logo_y &&
-        _stars[index].Y < logo_y + logoHeight &&
+      if (!hasLogo ||
+        !(_stars[index].X > logo_x && _stars[index].X < logo_x + logoWidth &&
+        _stars[index].Y > logo_y && _stars[index].Y < logo_y + logoHeight &&
         _imageLogo->GetPixel(_stars[index].X - logo_x, _stars[index].Y - logo_y) != TFT_TRANSPARENCY_COLOR))
       {
         DrawStar(_stars[index].X, _stars[index].Y, _stars[index].FullStars, TFT_COLOR_BACKGROUND, _stars[index].Size);
@@ -639,11 +610,9 @@ void DisplayDriver::DrawScreenSaver()
     }
 
     // Draw new star only outside of the logo
-    if (_imagesAvailable != IMAGE_SUCCESS || 
-      !(_stars[index].X > logo_x &&
-      _stars[index].X < logo_x + logoWidth &&
-      _stars[index].Y > logo_y &&
-      _stars[index].Y < logo_y + logoHeight &&
+    if (!hasLogo || 
+      !(_stars[index].X > logo_x && _stars[index].X < logo_x + logoWidth &&
+      _stars[index].Y > logo_y && _stars[index].Y < logo_y + logoHeight &&
       _imageLogo->GetPixel(_stars[index].X - logo_x, _stars[index].Y - logo_y) != TFT_TRANSPARENCY_COLOR))
     {
       DrawStar(_stars[index].X, _stars[index].Y, _stars[index].FullStars, TFT_COLOR_FOREGROUND, _stars[index].Size);
