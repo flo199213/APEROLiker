@@ -65,9 +65,6 @@ class StateMachine
     uint32_t _resetTimestamp = 0;
     const uint32_t ResetTime_ms = 2000;
 
-    // Wifi client variables
-    uint16_t _lastConnectedClients = 0;
-
     // Function menu state
     void FctMenu(MixerEvent event);
 

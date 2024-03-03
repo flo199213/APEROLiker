@@ -8,6 +8,8 @@
 
 #include "WifiHandler.h"
 
+#if defined(WIFI_MIXER)
+
 //===============================================================
 // Global variables
 //===============================================================
@@ -257,7 +259,10 @@ bool WifiHandler::StartWebServer()
   IPAddress local_ip(192, 168, 1, 1);
   IPAddress gateway(192, 168, 1, 1);
   IPAddress subnet(255, 255, 255, 0);
-  
+
+  // Set wifi TX power
+  WiFi.setTxPower(WIFI_POWER_19_5dBm);
+
   // Start access point
   WiFi.softAP(_ssid, _password);
   WiFi.softAPConfig(local_ip, gateway, subnet);
@@ -382,3 +387,5 @@ void WifiHandler::UpdateSettingsToClient(AsyncWebSocketClient* client)
   client->printf("LIQUID_ANGLES:%s,%s,%s", String(angle1).c_str(), String(angle2).c_str(), String(angle3).c_str());
   client->printf("CYCLE_TIMESPAN:%s", String(cycleTimepan_ms).c_str());
 }
+
+#endif

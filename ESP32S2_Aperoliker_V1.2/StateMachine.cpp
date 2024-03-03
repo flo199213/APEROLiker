@@ -35,6 +35,7 @@ void StateMachine::Begin(uint8_t pinBuzzer)
   UpdateValues();
 }
 
+#if defined(WIFI_MIXER)
 //===============================================================
 // Updates cycle timespan value from wifi
 //===============================================================
@@ -97,6 +98,7 @@ bool StateMachine::UpdateValuesFromWifi(uint32_t clientID, MixtureLiquid liquid,
 
   return true;
 }
+#endif
 
 //===============================================================
 // Returns the angle for a given liquid
@@ -126,6 +128,7 @@ MixerState StateMachine::GetCurrentState()
   return _currentState;
 }
 
+#if defined(WIFI_MIXER)
 //===============================================================
 // Handles new wifi data, should be called in state machine
 //===============================================================
@@ -190,7 +193,7 @@ void StateMachine::HandleNewWifiData(MixerEvent event)
     {
       // Update wifi clients
       Wifihandler.UpdateCycleTimespanToClients(newCycleTimespanClientID);
-      
+
       // Draw new values in settings mode and at main event
       if (_currentState == eSettings &&
         event == eMain)
@@ -201,23 +204,17 @@ void StateMachine::HandleNewWifiData(MixerEvent event)
     }
   }
 }
+#endif
 
 //===============================================================
 // General state machine execution function
 //===============================================================
 void StateMachine::Execute(MixerEvent event)
 {
-  // Check for new wifi data anf handle it if required
-  HandleNewWifiData(event);
-
   switch (_currentState)
   {
     case eMenu:
       FctMenu(event);
-      break;
-    default:
-    case eDashboard:
-      FctDashboard(event);
       break;
     case eCleaning:
       FctCleaning(event);
@@ -231,15 +228,10 @@ void StateMachine::Execute(MixerEvent event)
     case eScreenSaver:
       FctScreenSaver(event);
       break;
-  }
-
-  // Check connected clients and draw icons on top
-  uint16_t connectedClients = Wifihandler.GetConnectedClients();
-  if (_lastConnectedClients != connectedClients &&
-    _currentState != eScreenSaver)
-  {
-    _lastConnectedClients = connectedClients;
-    Display.DrawWifiIcons();
+    default:  // In case something went wrong, default case is dashboard
+    case eDashboard:
+      FctDashboard(event);
+      break;
   }
 }
 
@@ -301,6 +293,14 @@ void StateMachine::FctMenu(MixerEvent event)
           Display.DrawMenu();
         }
 
+#if defined(WIFI_MIXER)
+        // Draw wifi icons
+        Display.DrawWifiIcons();
+
+        // Check for new wifi data and handle it if required
+        HandleNewWifiData(event);
+#endif
+
         // Check for button press
         if (EncoderButton.IsButtonPress())
         {
@@ -311,6 +311,7 @@ void StateMachine::FctMenu(MixerEvent event)
           Execute(eExit);
           _currentState = _currentMenuState;
           Execute(eEntry);
+          return;
         }
 
         // Check for screen saver timeout
@@ -322,6 +323,7 @@ void StateMachine::FctMenu(MixerEvent event)
           _lastState = eMenu;
           _currentState = eScreenSaver;
           Execute(eEntry);
+          return;
         }
       }
       break;
@@ -408,6 +410,14 @@ void StateMachine::FctDashboard(MixerEvent event)
           delay(200);
         }
 
+#if defined(WIFI_MIXER)
+        // Draw wifi icons
+        Display.DrawWifiIcons();
+
+        // Check for new wifi data and handle it if required
+        HandleNewWifiData(event);
+#endif
+
         // Check for long button press
         if (EncoderButton.IsLongButtonPress())
         {
@@ -419,6 +429,7 @@ void StateMachine::FctDashboard(MixerEvent event)
           _currentState = eMenu;
           _currentMenuState = eDashboard;
           Execute(eEntry);
+          return;
         }
 
         // Check for screen saver timeout
@@ -430,6 +441,7 @@ void StateMachine::FctDashboard(MixerEvent event)
           _lastState = eDashboard;
           _currentState = eScreenSaver;
           Execute(eEntry);
+          return;
         }
       }
       break;
@@ -484,6 +496,14 @@ void StateMachine::FctCleaning(MixerEvent event)
           delay(200);
         }
 
+#if defined(WIFI_MIXER)
+        // Draw wifi icons
+        Display.DrawWifiIcons();
+
+        // Check for new wifi data and handle it if required
+        HandleNewWifiData(event);
+#endif
+
         // Check for long button press
         if (EncoderButton.IsLongButtonPress())
         {
@@ -495,6 +515,7 @@ void StateMachine::FctCleaning(MixerEvent event)
           _currentState = eMenu;
           _currentMenuState = eCleaning;
           Execute(eEntry);
+          return;
         }
         
         // Check for screen saver timeout
@@ -506,6 +527,7 @@ void StateMachine::FctCleaning(MixerEvent event)
           _lastState = eCleaning;
           _currentState = eScreenSaver;
           Execute(eEntry);
+          return;
         }
       }
       break;
@@ -543,6 +565,12 @@ void StateMachine::FctReset(MixerEvent event)
       break;
     case eMain:
       {
+
+#if defined(WIFI_MIXER)
+        // Check for new wifi data and handle it if required
+        HandleNewWifiData(event);
+#endif
+
         // Wait for the reset page display time
         if ((millis() - _resetTimestamp) > ResetTime_ms)
         {
@@ -550,6 +578,7 @@ void StateMachine::FctReset(MixerEvent event)
           Execute(eExit);
           _currentState = eDashboard;
           Execute(eEntry);
+          return;
         }
       }
       break;
@@ -595,13 +624,16 @@ void StateMachine::FctSettings(MixerEvent event)
           // Update cycle timespan
           Pumps.SetCycleTimespan(Pumps.GetCycleTimespan() + currentEncoderIncrements * 20);
 
+#if defined(WIFI_MIXER)
           // Update wifi clients (client ID = 0 -> no client)
           Wifihandler.UpdateCycleTimespanToClients(0);
+#endif
 
           // Draw settings in partial update mode
           Display.DrawSettings();
         }
 
+#if defined(WIFI_MIXER)
         // Check for short button press
         if (EncoderButton.IsButtonPress())
         {
@@ -612,9 +644,16 @@ void StateMachine::FctSettings(MixerEvent event)
           tone(_pinBuzzer, 500, 40);
 
           // Draw settings in partial update mode
-          Display.DrawWifiIcons();
+          Display.DrawWifiIcons(true);
           Display.DrawSettings();
         }
+
+        // Draw wifi icons
+        Display.DrawWifiIcons();
+
+        // Check for new wifi data and handle it if required
+        HandleNewWifiData(event);
+#endif
 
         // Check for long button press
         if (EncoderButton.IsLongButtonPress())
@@ -627,6 +666,7 @@ void StateMachine::FctSettings(MixerEvent event)
           _currentState = eMenu;
           _currentMenuState = eSettings;
           Execute(eEntry);
+          return;
         }
 
         // Check for screen saver timeout
@@ -638,13 +678,16 @@ void StateMachine::FctSettings(MixerEvent event)
           _lastState = eSettings;
           _currentState = eScreenSaver;
           Execute(eEntry);
+          return;
         }
       }
       break;
     case eExit:
       {
         Pumps.Save();
+#if defined(WIFI_MIXER)
         Wifihandler.Save();
+#endif
       }
       break;
     default:
@@ -689,6 +732,7 @@ void StateMachine::FctScreenSaver(MixerEvent event)
           Execute(eExit);
           _currentState = _lastState;
           Execute(eEntry);
+          return;
         }
       }
       break;
@@ -802,47 +846,33 @@ void StateMachine::UpdateValues(uint32_t clientID)
       break;
   }
 
+#if defined(WIFI_MIXER)
   // Update wifi clients
   Wifihandler.UpdateLiquidAnglesToClients(clientID);
+#endif
 }
 
 //===============================================================
-// Prints current mixture to serial port
+// Returns the current mixture a string
 //===============================================================
-void StateMachine::PrintMixture()
+String StateMachine::GetMixtureString()
 {
   // Calculate sum
   double sum_Percentage = _liquid1_Percentage + _liquid2_Percentage + _liquid3_Percentage;
   
-  // Serial output
-  Serial.print("[PRINT] ");
-  Serial.print(LIQUID1_NAME);
-  Serial.print(": ");
-  Serial.print(_liquid1_Percentage);
-  Serial.print("% (");
-  Serial.print(_liquid1Angle_Degrees);
-  Serial.print("°), ");
-  Serial.print(LIQUID2_NAME);
-  Serial.print(": ");
-  Serial.print(_liquid2_Percentage);
-  Serial.print("% (");
-  Serial.print(_liquid2Angle_Degrees);
-  Serial.print("°), ");
-  Serial.print(LIQUID3_NAME);
-  Serial.print(": ");
-  Serial.print(_liquid3_Percentage);
-  Serial.print("% (");
-  Serial.print(_liquid3Angle_Degrees);
-  Serial.print("°), Sum: ");
-  Serial.print(sum_Percentage);
+  // Build string output
+  String returnString;
+
+  returnString += String(LIQUID1_NAME) + ": " + String(_liquid1_Percentage) + "% (" + String(_liquid1Angle_Degrees) + "°), ";
+  returnString += String(LIQUID2_NAME) + ": " + String(_liquid2_Percentage) + "% (" + String(_liquid2Angle_Degrees) + "°), ";
+  returnString += String(LIQUID3_NAME) + ": " + String(_liquid3_Percentage) + "% (" + String(_liquid3Angle_Degrees) + "°), ";
+  returnString += "Sum: " + String(sum_Percentage) + "%";
   
   if ((sum_Percentage - 100.0) > 0.1 || (sum_Percentage - 100.0) < -0.1)
   {
     // Percentage error
-    Serial.println("% Error: Sum of all percentages must be ~100%");
+    returnString += " Error: Sum of all percentages must be ~100%";
   }
-  else
-  {
-    Serial.println("%");
-  }
+
+  return returnString;
 }

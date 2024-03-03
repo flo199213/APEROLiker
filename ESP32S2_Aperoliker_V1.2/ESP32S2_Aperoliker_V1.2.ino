@@ -14,7 +14,7 @@
  * - USB DFU On Boot: "Disabled"
  * - USB Firmware MSC On Boot: "Disabled"
  * - Flash Size: "4Mb (32Mb)"
- * - Partition Scheme: "No OTA (1MB APP/3MB SPIFFS)"
+ * - Partition Scheme: "No OTA (2MB APP/2MB SPIFFS)"
  * - PSRAM: "Enabled"
  * - Upload Mode: "Internal USB"
  * - Upload Speed: "921600"
@@ -43,6 +43,7 @@
 #include <WiFi.h>
 #include <Adafruit_ST7789.h>
 #include "Config.h"
+#include "SystemHelper.h"
 #include "StateMachine.h"
 #include "EncoderButtonDriver.h"
 #include "PumpDriver.h"
@@ -158,13 +159,24 @@ void setup(void)
 
   // Initialize serial communication
   Serial.begin(115200);
-  Serial.println(String("[SETUP] ") + MIXER_NAME + " " + APP_VERSION);
+#if defined(DEBUG_MIXER)
+  delay(2000);
+#endif
+  Serial.println("[SETUP] " + String(MIXER_NAME) + " " + String(APP_VERSION));
+  Serial.println(GetSystemInfoString());
+  Serial.println();
+
+  // Print restart reason
+  Serial.print("CPU0 reset reason: ");
+  Serial.println(GetResetReasonString(0));
+  Serial.println();
 
   // Initialize SPIFFS
+  SPIFFS.end(); // Close first for begin with 'formatOnFail'
   bool spiffsAvailable = SPIFFS.begin(true);
   size_t spiffsTotal = SPIFFS.totalBytes();
   size_t spiffsUsed = SPIFFS.usedBytes();
-  Serial.println(String("[SETUP] SPIFFS: ") + String(spiffsUsed) + "/" + String(spiffsTotal) + " Bytes used (SPIFFS Available: " + String(spiffsAvailable) + ")");
+  Serial.println(String("[SETUP] SPIFFS: ") + String(spiffsUsed) + "/" + String(spiffsTotal) + " Bytes used (SPIFFS Available: " + (spiffsAvailable ? "true" : "false") + ")");
 
   // Initialize SPI
   SPIClass* spi = new SPIClass(HSPI);
@@ -243,9 +255,11 @@ void setup(void)
     // Contains yield() for ESP32
     delay(1);
   }
-  
+
+#if defined(WIFI_MIXER)
   // Initialize wifi
   Wifihandler.Begin();
+#endif
 
   // Initial run of state machine with entry event
   Statemachine.Execute(eEntry);
@@ -256,13 +270,7 @@ void setup(void)
   // Start main task
   xTaskCreate(Main_Task, "Main_Task", 4096, NULL, 10, &mainTaskHandle);
 
-  // Final debug output
-  Serial.println("[SETUP]");
-  Serial.println("[SETUP] ESP32S2 sketch size: " + String(ESP.getSketchSize()) + " bytes");
-  Serial.println("[SETUP] ESP32S2 free sketch space: " + String(ESP.getFreeSketchSpace()) + " bytes");
-  Serial.println("[SETUP] ESP32S2 SDK version: " + String(ESP.getSdkVersion()));
-  Serial.println("[SETUP] ESP32S2 CPU Frequency: " + String(ESP.getCpuFreqMHz()) + " MHz");
-  Serial.println("[SETUP] ESP32S2 Chip MAC: " + String(WiFi.macAddress()));
+  // Final output
   Serial.println("[SETUP] Finished");
 }
 
@@ -277,8 +285,11 @@ void loop()
     aliveTimestamp = millis();
     Serial.println("[LOOP] Alive");
     
-    // Print mixture to serial port
-    Statemachine.PrintMixture();
+    // Print mixture information
+    Serial.println(Statemachine.GetMixtureString());
+
+    // Print memory information
+    Serial.println(GetMemoryInfoString());
   }
 
   // Flash LED light if dispensing is in progress
@@ -302,8 +313,10 @@ void loop()
   // Update pump outputs
   Pumps.Update();
 
+#if defined(WIFI_MIXER)
   // Update wifi, webserver and clients
   Wifihandler.Update();
+#endif
 }
 
 //===============================================================

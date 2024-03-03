@@ -18,43 +18,73 @@
 //===============================================================
 String GetSystemInfoString()
 {
-  String ss;
+  String returnString;
   
   uint32_t chipId = 0;
-	for(int i = 0; i < 17; i = i + 8)
+	for (int i = 0; i < 17; i = i + 8)
   {
     chipId |= ((ESP.getEfuseMac() >> (40 - i)) & 0xff) << i;
 	}
   
   // Chip-Information
-  ss += "** Chip-Information: **";
-  ss += "\nChip-ID:       " + String(chipId, HEX);
-  ss += "\nModel:         " + String(ESP.getChipModel());
-  ss += "\nRevision:      " + String(ESP.getChipRevision());
-  ss += "\n";
+  returnString += "** Chip-Information: **\n";
+  returnString += "Chip-ID:         0x" + String(chipId, HEX) + "\n";
+  returnString += "Model:           " + String(ESP.getChipModel()) + "\n";
+  returnString += "Revision:        " + String(ESP.getChipRevision()) + "\n";
+  returnString += "SDK Version:     " + String(ESP.getSdkVersion()) + "\n";
+  returnString += "\n";
 
   // CPU-Information
-  ss += "\n** CPU-Information: **";
-  ss += "\nCPU-Frequency: " + String(ESP.getCpuFreqMHz()) + " MHz";
-  ss += "\nCPU Count:     " + String(ESP.getChipCores());
-  ss += "\n";
-
-  // Storageinformation
-  ss += "\n** Storage-Information: **";
-  ss += "\nFlash-Size:    " + String((double)ESP.getFlashChipSize() / (1024.0 * 1024.0)) + " MB";
-  ss += "\nSRAM-Size:     " + String((double)ESP.getFreeHeap() / (1024.0 * 1024.0)) + " MB";
-  ss += "\nPRAM-Size:     " + String((double)ESP.getPsramSize() / (1024.0 * 1024.0)) + " MB";
-  ss += "\n";
+  returnString += "** CPU-Information: **\n";
+  returnString += "CPU-Frequency:   " + String(ESP.getCpuFreqMHz()) + " MHz\n";
+  returnString += "CPU Count:       " + String(ESP.getChipCores()) + "\n";
+  returnString += "\n";
 
   // WLAN-Information
-  ss += "\n** WLAN-Information: **";
-  ss += "\nSSID:          " + String(WiFi.SSID());
-  ss += "\nBSSID:         " + String(WiFi.BSSIDstr());
-  ss += "\nChannel:       " + String(WiFi.channel());
-  ss += "\nTX Power:      " + WifiPowerToString(WiFi.getTxPower());
-  ss += "\n";
+  returnString += "** WLAN-Information: **\n";
+  returnString += "MAC:             " + String(WiFi.macAddress()) + "\n";
+  returnString += "SSID:            " + String(WiFi.SSID()) + "\n";
+  returnString += "BSSID:           " + String(WiFi.BSSIDstr()) + "\n";
+  returnString += "Channel:         " + String(WiFi.channel()) + "\n";
+  returnString += "TX Power:        " + WifiPowerToString(WiFi.getTxPower()) + "\n";
+  returnString += "\n";
 
-  return ss;
+  // Memory-Tnformation
+  returnString += "** Memory-Information: **\n";
+  returnString += GetMemoryInfoString(true);
+  returnString += "\n";
+
+  return returnString;
+}
+
+//===============================================================
+// Returns memory info string
+//===============================================================
+String GetMemoryInfoString(bool allOrDynamic)
+{
+  String returnString;
+
+  bool spiffsAvailable = SPIFFS.begin(false);
+  double spiffsTotal = max(1.0, (double)SPIFFS.totalBytes());
+  double spiffsUsed = (double)SPIFFS.usedBytes();
+  double spiffsUsage = spiffsUsed / spiffsTotal * 100.0;
+
+  if (allOrDynamic)
+  {
+    returnString += "Flash-Size:      " + String((double)ESP.getFlashChipSize() / (1024.0 * 1024.0), 6) + " MB\n";
+    returnString += "SRAM-Size:       " + String((double)ESP.getFreeHeap() / (1024.0 * 1024.0), 6) + " MB\n";
+    returnString += "PRAM-Size:       " + String((double)ESP.getPsramSize() / (1024.0 * 1024.0), 6) + " MB\n";
+    returnString += "\n";
+    returnString += "Sketch-Size:     " + String((double)ESP.getSketchSize() / (1024.0 * 1024.0), 6) + " MB\n";
+    returnString += "FreeSketch-Size: " + String((double)ESP.getFreeSketchSpace() / (1024.0 * 1024.0), 6) + " MB\n";
+    returnString += "\n";
+    returnString += "SPIFFS Ready:    " + String(spiffsAvailable ? "true\n" : "false\n");
+    returnString += "SPIFFS-Total:    " + String(spiffsTotal / (1024.0 * 1024.0), 6) + " MB\n";
+  }
+  returnString += "SPIFFS-Used:     " + String(spiffsUsed / (1024.0 * 1024.0), 6) + " MB (" + spiffsUsage + "%)\n";
+  returnString += "Free-Heap:       " + String((double)ESP.getFreeHeap() / (1024.0 * 1024.0), 6) + " MB\n";
+
+  return returnString;
 }
 
 //===============================================================
@@ -90,5 +120,49 @@ String WifiPowerToString(wifi_power_t power)
       return "-1 dBm";
     default:
       return "Unknown";
+  }
+}
+
+//===============================================================
+// Returns the reset reason as string
+//===============================================================
+String GetResetReasonString(int cpu)
+{
+  int reason = rtc_get_reset_reason(cpu);
+  
+  switch ( reason)
+  {
+    case 1:
+      return "POWERON_RESET (Vbat power on reset)";
+    case 3:
+      return "SW_RESET (Software reset digital core)";
+    case 4:
+      return "OWDT_RESET (Legacy watch dog reset digital core)";
+    case 5:
+      return "DEEPSLEEP_RESET (Deep Sleep reset digital core)";
+    case 6:
+      return "SDIO_RESET (Reset by SLC module, reset digital core)";
+    case 7:
+      return "TG0WDT_SYS_RESET (Timer Group0 Watch dog reset digital core)";
+    case 8:
+      return "TG1WDT_SYS_RESET (Timer Group1 Watch dog reset digital core)";
+    case 9:
+      return "RTCWDT_SYS_RESET (RTC Watch dog Reset digital core)";
+    case 10:
+      return "INTRUSION_RESET (Instrusion tested to reset CPU)";
+    case 11:
+      return "TGWDT_CPU_RESET (Time Group reset CPU)";
+    case 12:
+      return "SW_CPU_RESET (Software reset CPU)";
+    case 13:
+      return "RTCWDT_CPU_RESET (RTC Watch dog Reset CPU)";
+    case 14:
+      return "EXT_CPU_RESET (for APP CPU, reseted by PRO CPU)";
+    case 15:
+      return "RTCWDT_BROWN_OUT_RESET (Reset when the vdd voltage is not stable)";
+    case 16:
+      return "RTCWDT_RTC_RESET (RTC Watch dog reset digital core and rtc module)";
+    default:
+      return "NO_MEAN";
   }
 }

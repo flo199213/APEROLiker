@@ -41,6 +41,7 @@ class StateMachine
     // Initializes the state machine
     void Begin(uint8_t pinBuzzer);
 
+#if defined(WIFI_MIXER)
     // Updates cycle timespan value from wifi
     bool UpdateValuesFromWifi(uint32_t clientID, uint32_t cycletimespan_ms);
 
@@ -49,6 +50,7 @@ class StateMachine
 
     // Updates a liquid values from wifi
     bool UpdateValuesFromWifi(uint32_t clientID, MixtureLiquid liquid, int16_t increments_Degrees);
+#endif
 
     // Returns the angle for a given liquid
     int16_t GetAngle(MixtureLiquid liquid);
@@ -59,8 +61,8 @@ class StateMachine
     // General state machine execution function
     void Execute(MixerEvent event);
 
-    // Prints current mixture to serial port
-    void PrintMixture();
+    // Returns the current mixture a string
+    String GetMixtureString();
 
   private:
     // Pin definitions
@@ -87,9 +89,6 @@ class StateMachine
     uint32_t _resetTimestamp = 0;
     const uint32_t ResetTime_ms = 2000;
 
-    // Wifi client variables
-    uint16_t _lastConnectedClients = 0;
-
     // Wifi new liquid data variables
     uint32_t _newLiquidClientID = 0;
     MixtureLiquid _newLiquid = eLiquidNone;
@@ -100,8 +99,10 @@ class StateMachine
     bool _newCycleTimespan = false;
     uint32_t _newCycleTimespan_ms = 0;
 
+#if defined(WIFI_MIXER)
     // Handles new wifi data, should be called in state machine
     void HandleNewWifiData(MixerEvent event);
+#endif
 
     // Function menu state
     void FctMenu(MixerEvent event);

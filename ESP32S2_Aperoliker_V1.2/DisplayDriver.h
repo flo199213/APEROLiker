@@ -224,7 +224,7 @@ class DisplayDriver
     void ShowScreenSaverPage();
     
     // Draws the Wifi icon
-    void DrawWifiIcons();
+    void DrawWifiIcons(bool isfullUpdate = false);
     
     // Draws the info box
     void DrawInfoBox(const String &line1, const String &line2);
@@ -289,6 +289,7 @@ class DisplayDriver
     String _lastDraw_Liquid3String = "";
     uint32_t _lastDraw_cycleTimespan_ms = 0;
     wifi_mode_t _lastDraw_wifiMode = WIFI_MODE_NULL;
+    uint16_t _lastDraw_ConnectedClients = 0;
 
     // Screen saver variables
     Star _stars[SCREENSAVER_STARCOUNT];

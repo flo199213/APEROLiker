@@ -342,15 +342,18 @@ void DisplayDriver::DrawHeader(const String &text, bool withIcons)
 
   if (withIcons)
   {
+#if defined(WIFI_MIXER)
     // Draw wifi icons
-    DrawWifiIcons();
+    DrawWifiIcons(true);
+#endif
   }
 }
 
+#if defined(WIFI_MIXER)
 //===============================================================
 // Draws the Wifi icon
 //===============================================================
-void DisplayDriver::DrawWifiIcons()
+void DisplayDriver::DrawWifiIcons(bool isfullUpdate)
 {
   int16_t x = TFT_WIDTH - 24 - 5;
   int16_t y = 2;
@@ -359,6 +362,13 @@ void DisplayDriver::DrawWifiIcons()
 
   wifi_mode_t wifiMode = Wifihandler.GetWifiMode();
   uint16_t connectedClients = Wifihandler.GetConnectedClients();
+  
+  // Check connected clients for changed value
+  if (_lastDraw_ConnectedClients == connectedClients && !isfullUpdate)
+  {
+    return;
+  }
+  _lastDraw_ConnectedClients = connectedClients;
 
   // Clear wifi icon
   _tft->drawXBitmap(x, y, icon_wifi, width, height, TFT_COLOR_BACKGROUND);
@@ -382,6 +392,7 @@ void DisplayDriver::DrawWifiIcons()
     _tft->print(connectedClients);
   }
 }
+#endif
 
 //===============================================================
 // Draws the info box
@@ -515,6 +526,7 @@ void DisplayDriver::DrawCheckBoxes(MixtureLiquid liquid)
 //===============================================================
 void DisplayDriver::DrawSettings(bool isfullUpdate)
 {
+#if defined(WIFI_MIXER)
   int16_t x = 15;
   int16_t y = HEADEROFFSET_Y + 25 + LONGLINEOFFSET;
  
@@ -541,6 +553,7 @@ void DisplayDriver::DrawSettings(bool isfullUpdate)
     
     _lastDraw_wifiMode = wifiMode;
   }
+#endif
 }
 
 //===============================================================

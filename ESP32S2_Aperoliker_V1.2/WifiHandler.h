@@ -23,6 +23,7 @@
 #include "Config.h"
 #include "StateMachine.h"
 
+#if defined(WIFI_MIXER)
 
 //===============================================================
 // Defines
@@ -106,4 +107,5 @@ class WifiHandler
 extern WifiHandler Wifihandler;
 
 
+#endif
 #endif

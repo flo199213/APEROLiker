@@ -50,10 +50,6 @@ void StateMachine::Execute(MixerEvent event)
     case eMenu:
       FctMenu(event);
       break;
-    default:
-    case eDashboard:
-      FctDashboard(event);
-      break;
     case eCleaning:
       FctCleaning(event);
       break;
@@ -66,14 +62,10 @@ void StateMachine::Execute(MixerEvent event)
     case eScreenSaver:
       FctScreenSaver(event);
       break;
-  }
-
-  // Check connected clients and draw icons on top
-  uint16_t connectedClients = Wifihandler.GetConnectedClients();
-  if (_lastConnectedClients != connectedClients)
-  {
-    _lastConnectedClients = connectedClients;
-    Display.DrawWifiIcons();
+    default:  // In case something went wrong, default case is dashboard
+    case eDashboard:
+      FctDashboard(event);
+      break;
   }
 }
 
@@ -135,6 +127,11 @@ void StateMachine::FctMenu(MixerEvent event)
           Display.DrawMenu();
         }
 
+#if defined(WIFI_MIXER)
+        // Draw wifi icons
+        Display.DrawWifiIcons();
+#endif
+
         // Check for button press
         if (EncoderButton.IsButtonPress())
         {
@@ -145,6 +142,7 @@ void StateMachine::FctMenu(MixerEvent event)
           Execute(eExit);
           _currentState = _currentMenuState;
           Execute(eEntry);
+          return;
         }
         
         // Check for screen saver timeout
@@ -156,6 +154,7 @@ void StateMachine::FctMenu(MixerEvent event)
           _lastState = eMenu;
           _currentState = eScreenSaver;
           Execute(eEntry);
+          return;
         }
       }
       break;
@@ -235,6 +234,11 @@ void StateMachine::FctDashboard(MixerEvent event)
           }
         }
 
+#if defined(WIFI_MIXER)
+        // Draw wifi icons
+        Display.DrawWifiIcons();
+#endif
+
         // Check for button press
         if (EncoderButton.IsButtonPress())
         {
@@ -265,6 +269,7 @@ void StateMachine::FctDashboard(MixerEvent event)
           _currentState = eMenu;
           _currentMenuState = eDashboard;
           Execute(eEntry);
+          return;
         }
 
         // Check for screen saver timeout
@@ -276,6 +281,7 @@ void StateMachine::FctDashboard(MixerEvent event)
           _lastState = eDashboard;
           _currentState = eScreenSaver;
           Execute(eEntry);
+          return;
         }
       }
       break;
@@ -330,6 +336,11 @@ void StateMachine::FctCleaning(MixerEvent event)
           delay(200);
         }
 
+#if defined(WIFI_MIXER)
+        // Draw wifi icons
+        Display.DrawWifiIcons();
+#endif
+
         // Check for long button press
         if (EncoderButton.IsLongButtonPress())
         {
@@ -341,6 +352,7 @@ void StateMachine::FctCleaning(MixerEvent event)
           _currentState = eMenu;
           _currentMenuState = eCleaning;
           Execute(eEntry);
+          return;
         }
         
         // Check for screen saver timeout
@@ -352,6 +364,7 @@ void StateMachine::FctCleaning(MixerEvent event)
           _lastState = eCleaning;
           _currentState = eScreenSaver;
           Execute(eEntry);
+          return;
         }
       }
       break;
@@ -393,6 +406,7 @@ void StateMachine::FctReset(MixerEvent event)
           Execute(eExit);
           _currentState = eDashboard;
           Execute(eEntry);
+          return;
         }
       }
       break;
@@ -429,6 +443,7 @@ void StateMachine::FctSettings(MixerEvent event)
       break;
     case eMain:
       {
+#if defined(WIFI_MIXER)
         // Check for short button press
         if (EncoderButton.IsButtonPress())
         {
@@ -439,9 +454,13 @@ void StateMachine::FctSettings(MixerEvent event)
           tone(_pinBuzzer, 500, 40);
 
           // Draw settings in partial update mode
-          Display.DrawWifiIcons();
+          Display.DrawWifiIcons(true);
           Display.DrawSettings();
         }
+
+        // Draw wifi icons
+        Display.DrawWifiIcons();
+#endif
 
         // Check for long button press
         if (EncoderButton.IsLongButtonPress())
@@ -454,6 +473,7 @@ void StateMachine::FctSettings(MixerEvent event)
           _currentState = eMenu;
           _currentMenuState = eSettings;
           Execute(eEntry);
+          return;
         }
 
         // Check for screen saver timeout
@@ -465,12 +485,15 @@ void StateMachine::FctSettings(MixerEvent event)
           _lastState = eSettings;
           _currentState = eScreenSaver;
           Execute(eEntry);
+          return;
         }
       }
       break;
     case eExit:
       {
+#if defined(WIFI_MIXER)
         Wifihandler.Save();
+#endif
       }
       break;
     default:
@@ -515,6 +538,7 @@ void StateMachine::FctScreenSaver(MixerEvent event)
           Execute(eExit);
           _currentState = _lastState;
           Execute(eEntry);
+          return;
         }
       }
       break;

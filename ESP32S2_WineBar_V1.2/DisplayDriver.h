@@ -209,7 +209,7 @@ class DisplayDriver
     void ShowScreenSaverPage();
 
     // Draws the Wifi icon
-    void DrawWifiIcons();
+    void DrawWifiIcons(bool isfullUpdate = false);
     
     // Draws the info box
     void DrawInfoBox(const String &line1, const String &line2);

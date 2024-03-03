@@ -8,6 +8,8 @@
 
 #include "WifiHandler.h"
 
+#if defined(WIFI_MIXER)
+
 //===============================================================
 // Global variables
 //===============================================================
@@ -179,6 +181,9 @@ bool WifiHandler::StartWebServer()
   IPAddress gateway(192, 168, 1, 1);
   IPAddress subnet(255, 255, 255, 0);
   
+  // Set wifi TX power
+  WiFi.setTxPower(WIFI_POWER_19_5dBm);
+  
   // Start access point
   WiFi.softAP(_ssid, _password);
   WiFi.softAPConfig(local_ip, gateway, subnet);
@@ -296,3 +301,5 @@ void WifiHandler::UpdateSettingsToClient(AsyncWebSocketClient* client)
   client->printf("LIQUID_NAMES:%s,%s,%s", LIQUID1_NAME, LIQUID2_NAME, LIQUID3_NAME);
   client->printf("LIQUID_COLORS:%s,%s,%s", String(WIFI_COLOR_LIQUID_1).c_str(), String(WIFI_COLOR_LIQUID_2).c_str(), String(WIFI_COLOR_LIQUID_3).c_str());
 }
+
+#endif
