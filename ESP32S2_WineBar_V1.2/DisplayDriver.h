@@ -218,7 +218,7 @@ class DisplayDriver
     void DrawMenu(bool isfullUpdate = false);
 
     // Draw checkboxes
-    void DrawCheckBoxes(MixtureLiquid liquid);
+    void DrawCheckBoxes(MixtureLiquid liquid, bool bottles = false, bool isfullUpdate = false);
 
     // Draws settings partially
     void DrawSettings(bool isfullUpdate = false);
@@ -235,6 +235,10 @@ class DisplayDriver
     SPIFFSImage* _imageBottle;
     SPIFFSImage* _imageGlass;
     SPIFFSImage* _imageLogo;
+    SPIFFSImage* _imageBottleWhiteWine;
+    SPIFFSImage* _imageBottleRoseWine;
+    SPIFFSImage* _imageBottleSparklingWater;
+
     SPIFFSImageReader reader;
     ImageReturnCode _imagesAvailable = IMAGE_ERR_FILE_NOT_FOUND;
 

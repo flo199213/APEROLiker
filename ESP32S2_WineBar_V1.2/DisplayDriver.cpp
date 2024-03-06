@@ -47,6 +47,9 @@ void DisplayDriver::Begin(Adafruit_ST7789* tft, bool spiffsAvailable)
   _imageBottle = new SPIFFSImage();
   _imageGlass = new SPIFFSImage();
   _imageLogo = new SPIFFSImage();
+  _imageBottleWhiteWine = new SPIFFSImage();
+  _imageBottleRoseWine = new SPIFFSImage();
+  _imageBottleSparklingWater = new SPIFFSImage();
 
   // Load startup images to RAM
   if (spiffsAvailable)
@@ -54,7 +57,10 @@ void DisplayDriver::Begin(Adafruit_ST7789* tft, bool spiffsAvailable)
     // Set images available
     _imagesAvailable = (reader.LoadBMP(startupImageBottle.c_str(), _imageBottle) == IMAGE_SUCCESS &&
       reader.LoadBMP(startupImageGlass.c_str(), _imageGlass) == IMAGE_SUCCESS &&
-      reader.LoadBMP(startupImageLogo.c_str(), _imageLogo) == IMAGE_SUCCESS) ? IMAGE_SUCCESS : IMAGE_ERR_FILE_NOT_FOUND;
+      reader.LoadBMP(startupImageLogo.c_str(), _imageLogo) == IMAGE_SUCCESS &&
+      reader.LoadBMP(imageBottleWhiteWine.c_str(), _imageBottleWhiteWine) == IMAGE_SUCCESS &&
+      reader.LoadBMP(imageBottleRoseWine.c_str(), _imageBottleRoseWine) == IMAGE_SUCCESS &&
+      reader.LoadBMP(imageBottleSparklingWater.c_str(), _imageBottleSparklingWater) == IMAGE_SUCCESS) ? IMAGE_SUCCESS : IMAGE_ERR_FILE_NOT_FOUND;
   }
   else
   {
@@ -105,9 +111,9 @@ void DisplayDriver::ShowIntroPage()
     _imageLogo->Draw(TFT_LOGO_POS_X,     TFT_LOGO_POS_Y,   _tft, TFT_TRANSPARENCY_COLOR);
 
     // Free memory
-    delete _imageBottle;
     delete _imageGlass;
-    //delete _imageLogo; // Do NOT delete logo image for usage with screen saver!
+    //delete _imageBottle; // Do NOT delete bottle image for usage with dashboard!
+    //delete _imageLogo;   // Do NOT delete logo image for usage with screen saver!
   }
   else
   {
@@ -186,23 +192,15 @@ void DisplayDriver::ShowDashboardPage()
   // Draw header information
   DrawHeader();
   
+  // Draw checkboxes
+  Display.DrawCheckBoxes(_dashboardLiquid, true, true);
+  
   int16_t x = TFT_WIDTH / 2;
   int16_t y = TFT_HEIGHT / 3;
-  
+
   // Print selection text
   _tft->setTextColor(TFT_COLOR_FOREGROUND);
   DrawCenteredString("Select WINE for dispensing:", x, y, false, 0);
-
-  // Draw checkboxes
-  Display.DrawCheckBoxes(_dashboardLiquid);
-  
-  int16_t x0 = TFT_WIDTH / 2;
-  int16_t y0 = TFT_HEIGHT - 30;
-
-  // Draw enjoy message
-  _tft->setTextSize(1);
-  _tft->setTextColor(TFT_COLOR_FOREGROUND);
-  DrawCenteredString("Enjoy it!", x0, y0, false, 0);
 }
 
 //===============================================================
@@ -224,7 +222,7 @@ void DisplayDriver::ShowCleaningPage()
   DrawCenteredString("Select pumps for cleaning:", x, y, false, 0);
 
   // Draw checkboxes
-  DrawCheckBoxes(_cleaningLiquid);
+  DrawCheckBoxes(_cleaningLiquid, false, true);
 }
 
 //===============================================================
@@ -483,42 +481,90 @@ void DisplayDriver::DrawMenu(bool isfullUpdate)
 //===============================================================
 // Draw checkboxes
 //===============================================================
-void DisplayDriver::DrawCheckBoxes(MixtureLiquid liquid)
+void DisplayDriver::DrawCheckBoxes(MixtureLiquid liquid, bool bottles, bool isfullUpdate)
 {
+  int16_t spacing = 5;
   int16_t boxWidth = 30;
   int16_t boxHeight = 30;
   int16_t boxDistance = TFT_WIDTH * 2 / 7;
 
   int16_t x = TFT_WIDTH / 7;
-  int16_t y = HEADEROFFSET_Y + TFT_HEIGHT / 3;
+  int16_t y = HEADEROFFSET_Y + 10;
+  int16_t y_CheckBoxes = HEADEROFFSET_Y + 80;
+  int16_t y_Names = bottles ? TFT_WIDTH - 25 : HEADEROFFSET_Y + 140;
+  int16_t x_Names_Offset = bottles ? 12 : 0;
   
-  // Draw checkboxes
-  _tft->drawRect(x,                y, boxWidth, boxHeight, TFT_COLOR_FOREGROUND);
-  _tft->drawRect(x += boxDistance, y, boxWidth, boxHeight, TFT_COLOR_FOREGROUND);
-  _tft->drawRect(x += boxDistance, y, boxWidth, boxHeight, TFT_COLOR_FOREGROUND);
-
-  // Reduce rectangle for infill
-  x = TFT_WIDTH / 7 + 4;
-  y += 4;
-  boxWidth -= 8;
-  boxHeight -= 8;
+  if (isfullUpdate)
+  {
+    if (bottles &&
+      _imagesAvailable == IMAGE_SUCCESS)
+    {
+      // Draw bottle 1 image
+      _imageBottle->Draw(x + boxWidth / 2 - _imageBottle->Width() / 2 - spacing, y, _tft, TFT_TRANSPARENCY_COLOR);
+    }
   
-  // Draw activated checkboxes
-  _tft->fillRect(x,                y, boxWidth, boxHeight, liquid == eLiquidAll || liquid == eLiquid1 ? TFT_COLOR_STARTPAGE : TFT_COLOR_BACKGROUND);
-  _tft->fillRect(x += boxDistance, y, boxWidth, boxHeight, liquid == eLiquidAll || liquid == eLiquid2 ? TFT_COLOR_STARTPAGE : TFT_COLOR_BACKGROUND);
-  _tft->fillRect(x += boxDistance, y, boxWidth, boxHeight, liquid == eLiquidAll || liquid == eLiquid3 ? TFT_COLOR_STARTPAGE : TFT_COLOR_BACKGROUND);
+    // Draw checkbox 1
+    _tft->drawRect(x - spacing, y_CheckBoxes, boxWidth, boxHeight, TFT_COLOR_FOREGROUND);
 
-  // Move under the boxes for liquid names
-  x = TFT_WIDTH / 7 + boxWidth / 2;
-  y += 2 * boxHeight;
+    // Draw liquid 1 name
+    _tft->setTextColor(TFT_COLOR_LIQUID_1);
+    _tft->fillRect(x - 15 - spacing, y_Names - 15, 54, 30, TFT_COLOR_BACKGROUND);
+    DrawCenteredString(LIQUID1_NAME, x + boxWidth / 2 - x_Names_Offset - spacing, y_Names, false, 0);
+  }
 
-  // Draw liquid names
-  _tft->setTextColor(TFT_COLOR_LIQUID_1);
-  DrawCenteredString(LIQUID1_NAME, x,                y, false, 0);
-  _tft->setTextColor(TFT_COLOR_LIQUID_2);
-  DrawCenteredString(LIQUID2_NAME, x += boxDistance, y, false, 0);
-  _tft->setTextColor(TFT_COLOR_LIQUID_3);
-  DrawCenteredString(LIQUID3_NAME, x += boxDistance, y, false, 0);
+  // Draw checkbox 1 infill if active liquid
+  _tft->fillRect(x + 4 - spacing, y_CheckBoxes + 4, boxWidth - 8, boxHeight - 8, liquid == eLiquidAll || liquid == eLiquid1 ? TFT_COLOR_STARTPAGE : TFT_COLOR_BACKGROUND);
+
+  x += boxDistance;
+
+  if (isfullUpdate)
+  {
+    if (bottles &&
+      _imagesAvailable == IMAGE_SUCCESS)
+    {
+      // Draw bottle 2 image
+      _imageBottleWhiteWine->Draw(x + boxWidth / 2 - _imageBottleWhiteWine->Width() / 2, y, _tft, TFT_TRANSPARENCY_COLOR);
+    }
+
+    // Draw checkbox 2
+    _tft->drawRect(x, y_CheckBoxes, boxWidth, boxHeight, TFT_COLOR_FOREGROUND);
+    
+    // Draw liquid 2 name
+    _tft->setTextColor(TFT_COLOR_LIQUID_2);
+    _tft->fillRect(x - 15, y_Names - 15, 54, 30, TFT_COLOR_BACKGROUND);
+    DrawCenteredString(LIQUID2_NAME, x + boxWidth / 2 - x_Names_Offset, y_Names, false, 0);
+  }
+
+  // Draw checkbox 2 infill if active liquid
+  _tft->fillRect(x + 4, y_CheckBoxes + 4, boxWidth - 8, boxHeight - 8, liquid == eLiquidAll || liquid == eLiquid2 ? TFT_COLOR_STARTPAGE : TFT_COLOR_BACKGROUND);
+
+  x += boxDistance;
+  
+  if (isfullUpdate)
+  {
+    if (bottles &&
+      _imagesAvailable == IMAGE_SUCCESS)
+    {
+      // Draw bottle 3 image
+      _imageBottleRoseWine->Draw(x + boxWidth / 2 - _imageBottleRoseWine->Width() / 2 + spacing, y, _tft, TFT_TRANSPARENCY_COLOR);
+    }
+
+    // Draw checkbox 3
+    _tft->drawRect(x + spacing, y_CheckBoxes, boxWidth, boxHeight, TFT_COLOR_FOREGROUND);
+    _tft->fillRect(x + 4 + spacing, y_CheckBoxes + 4, boxWidth - 8, boxHeight - 8, liquid == eLiquidAll || liquid == eLiquid3 ? TFT_COLOR_STARTPAGE : TFT_COLOR_BACKGROUND);
+
+    // Draw liquid 3 name
+    _tft->setTextColor(TFT_COLOR_LIQUID_3);
+    _tft->fillRect(x - 15 + spacing, y_Names - 15, 54, 30, TFT_COLOR_BACKGROUND);
+    DrawCenteredString(LIQUID3_NAME, x + boxWidth / 2 - x_Names_Offset + spacing, y_Names, false, 0);
+  }
+
+  // Draw checkbox 3 infill if active wine
+  _tft->fillRect(x + 4 + spacing, y_CheckBoxes + 4, boxWidth - 8, boxHeight - 8, liquid == eLiquidAll || liquid == eLiquid3 ? TFT_COLOR_STARTPAGE : TFT_COLOR_BACKGROUND);
+
+
+  // TODO: Draw Sparkling Water
+  //imageBottleSparklingWater->Draw(x, y, _tft, TFT_TRANSPARENCY_COLOR);
 }
 
 //===============================================================

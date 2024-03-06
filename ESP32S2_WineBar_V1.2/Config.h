@@ -74,16 +74,16 @@ enum MixerEvent : uint16_t
 #define LIQUID3_NAME                      "Wine 3"        // Should not exceed 8 characters
 
 // Color defines
-#define TFT_COLOR_STARTPAGE               0xA000
+#define TFT_COLOR_STARTPAGE               0xD000
 #define TFT_COLOR_STARTPAGE_FOREGROUND    0xDF9E
 #define TFT_COLOR_STARTPAGE_BACKGROUND    0xA6DC
-#define TFT_COLOR_TEXT_HEADER             0xA000
+#define TFT_COLOR_TEXT_HEADER             0xD000
 #define TFT_COLOR_TEXT_BODY               ST77XX_WHITE
-#define TFT_COLOR_INFOBOX_BORDER          0xA000
-#define TFT_COLOR_INFOBOX_FOREGROUND      0xA000
+#define TFT_COLOR_INFOBOX_BORDER          0xD000
+#define TFT_COLOR_INFOBOX_FOREGROUND      0xD000
 #define TFT_COLOR_INFOBOX_BACKGROUND      ST77XX_WHITE
-#define TFT_COLOR_MENU_SELECTOR           0xA000
-#define TFT_COLOR_LIQUID_1                0xA000
+#define TFT_COLOR_MENU_SELECTOR           0xD000
+#define TFT_COLOR_LIQUID_1                0xD000
 #define TFT_COLOR_LIQUID_2                0x93AB
 #define TFT_COLOR_LIQUID_3                0x0390
 #define TFT_COLOR_FOREGROUND              ST77XX_WHITE
@@ -93,10 +93,15 @@ enum MixerEvent : uint16_t
 #define WIFI_COLOR_LIQUID_2               0x90745E
 #define WIFI_COLOR_LIQUID_3               0x00E784
 
-// Startup image
+// Startup images
 const String startupImageBottle = "/BottleWineBar.bmp";
 const String startupImageGlass = "/GlassWineBar.bmp";
 const String startupImageLogo = "/LogoWineBar.bmp";
+
+// Bottle images
+const String imageBottleWhiteWine = "/BottleWhiteWine.bmp";
+const String imageBottleRoseWine = "/BottleRoseWine.bmp";
+const String imageBottleSparklingWater = "/BottleSparklingWater.bmp";
 
 #define TFT_TRANSPARENCY_COLOR            0x07E0
 #define TFT_LOGO_POS_X                    0

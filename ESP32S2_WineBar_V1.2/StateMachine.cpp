@@ -227,7 +227,7 @@ void StateMachine::FctDashboard(MixerEvent event)
             UpdateValues();
             
             // Draw checkboxes
-            Display.DrawCheckBoxes(_dashboardLiquid);
+            Display.DrawCheckBoxes(_dashboardLiquid, true);
             
             // Debounce settings change
             delay(200);
@@ -252,7 +252,7 @@ void StateMachine::FctDashboard(MixerEvent event)
           UpdateValues();
           
           // Draw checkboxes
-          Display.DrawCheckBoxes(_dashboardLiquid);
+          Display.DrawCheckBoxes(_dashboardLiquid, true);
           
           // Debounce settings change
           delay(200);
