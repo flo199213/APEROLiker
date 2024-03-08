@@ -214,13 +214,6 @@ void DisplayDriver::ShowDashboardPage()
   
   // Draw bar
   Display.DrawBar(true, true);
-  
-  int16_t x = TFT_WIDTH / 2;
-  int16_t y = 65;
-
-  // Print selection text
-  _tft->setTextColor(TFT_COLOR_FOREGROUND);
-  DrawCenteredString("Select WINE for dispensing:", x, y, false, true, 0, 0x528A); // Gray
 }
 
 //===============================================================
@@ -517,32 +510,46 @@ void DisplayDriver::DrawMenu(bool isfullUpdate)
 //===============================================================
 void DisplayDriver::DrawBar(bool isDashboard, bool isfullUpdate)
 {
+  int16_t spacing = 78;
+  int16_t x0 = TFT_WIDTH / 2; // Mid screen
+  int16_t y = HEADEROFFSET_Y + 10;
+
   // Draw only check boxes if complete bar stock is empty
   if (isDashboard &&
     _barBottle1 == eEmpty &&
     _barBottle2 == eEmpty &&
     _barBottle3 == eEmpty)
   {
+    // Print selection text
+    _tft->setTextColor(TFT_COLOR_FOREGROUND);
+    DrawCenteredString("Select WINE for dispensing:", x0, y + 25, false, true, 0, 0x528A); // Gray
+
     // Draw checkboxes
     DrawCheckBoxes(_dashboardLiquid);
-    return;
   }
+  else
+  {
+    // Draw each bottle
+    DrawBarPart(x0 - spacing, y, eLiquid1, _barBottle1, _lastDraw_barBottle1, _liquid1_Percentage, _lastDraw_liquid1_Percentage, LIQUID1_NAME, TFT_COLOR_LIQUID_1, isDashboard, isfullUpdate);
+    DrawBarPart(x0,           y, eLiquid2, _barBottle2, _lastDraw_barBottle2, _liquid2_Percentage, _lastDraw_liquid2_Percentage, LIQUID2_NAME, TFT_COLOR_LIQUID_2, isDashboard, isfullUpdate);
+    DrawBarPart(x0 + spacing, y, eLiquid3, _barBottle3, _lastDraw_barBottle3, _liquid3_Percentage, _lastDraw_liquid3_Percentage, LIQUID3_NAME, TFT_COLOR_LIQUID_3, isDashboard, isfullUpdate);
 
-  int16_t spacing = 78;
-  int16_t x0 = TFT_WIDTH / 2; // Mid screen
-  int16_t y = HEADEROFFSET_Y + 10;
+    if (isDashboard &&
+      (isfullUpdate || _dashboardLiquid != _lastDraw_SelectedLiquid))
+    {
+      // Print selection text
+      _tft->setTextColor(TFT_COLOR_FOREGROUND);
+      DrawCenteredString("Select WINE for dispensing:", x0, y + 25, false, true, 0, 0x528A); // Gray
+    }
 
-  DrawBarPart(x0 - spacing, y, eLiquid1, _barBottle1, _lastDraw_barBottle1, _liquid1_Percentage, _lastDraw_liquid1_Percentage, LIQUID1_NAME, TFT_COLOR_LIQUID_1, isDashboard, isfullUpdate);
-  DrawBarPart(x0,           y, eLiquid2, _barBottle2, _lastDraw_barBottle2, _liquid2_Percentage, _lastDraw_liquid2_Percentage, LIQUID2_NAME, TFT_COLOR_LIQUID_2, isDashboard, isfullUpdate);
-  DrawBarPart(x0 + spacing, y, eLiquid3, _barBottle3, _lastDraw_barBottle3, _liquid3_Percentage, _lastDraw_liquid3_Percentage, LIQUID3_NAME, TFT_COLOR_LIQUID_3, isDashboard, isfullUpdate);
-
-  _lastDraw_SelectedLiquid = _dashboardLiquid;
-  _lastDraw_barBottle1 = _barBottle1;
-  _lastDraw_barBottle2 = _barBottle2;
-  _lastDraw_barBottle3 = _barBottle3;
-  _lastDraw_liquid1_Percentage = _liquid1_Percentage;
-  _lastDraw_liquid2_Percentage = _liquid2_Percentage;
-  _lastDraw_liquid3_Percentage = _liquid3_Percentage;
+    _lastDraw_SelectedLiquid = _dashboardLiquid;
+    _lastDraw_barBottle1 = _barBottle1;
+    _lastDraw_barBottle2 = _barBottle2;
+    _lastDraw_barBottle3 = _barBottle3;
+    _lastDraw_liquid1_Percentage = _liquid1_Percentage;
+    _lastDraw_liquid2_Percentage = _liquid2_Percentage;
+    _lastDraw_liquid3_Percentage = _liquid3_Percentage;
+  }
 }
 
 //===============================================================
@@ -778,8 +785,6 @@ void DisplayDriver::DrawStarTail(int16_t x0, int16_t y0, int16_t start, int16_t 
 //===============================================================
 void DisplayDriver::DrawBarPart(int16_t x0, int16_t y, MixtureLiquid liquid, BarBottle barBottle, BarBottle lastDraw_barBottle, int16_t liquid_Percentage, int16_t lastDraw_liquid_Percentage, String name, uint16_t color, bool isDashboard, bool isfullUpdate)
 {
-  int16_t boxSize = 30;
-  int16_t checkboxOffsetY = 70;
   int16_t namesOffsetX = 15;
   int16_t namesOffsetY = 175;
   
@@ -788,29 +793,29 @@ void DisplayDriver::DrawBarPart(int16_t x0, int16_t y, MixtureLiquid liquid, Bar
   bool bottleChanged = barBottle != lastDraw_barBottle;
   bool sparklingWaterChanged = liquid_Percentage != lastDraw_liquid_Percentage;
   bool isSelected = _dashboardLiquid == liquid;
+  bool wasSelected = _lastDraw_SelectedLiquid == liquid;
   bool hasSparklingWater = _barBottle1 == eSparklingWater || _barBottle2 == eSparklingWater || _barBottle3 == eSparklingWater;
 
   // Reset old bottle type selection -> only if bottle type changed
-  if (!isDashboard && bottleChanged)
+  if (bottleChanged)
   {
     SelectBarBottle(lastDraw_barBottle, x0, y, TFT_COLOR_BACKGROUND);
   }
 
-  // Reset current bottle type selection -> only if selection changed
-  if (!isDashboard && selectedChanged)
+  // Reset current bottle type selection -> only if selection changed and was selected
+  if (selectedChanged && wasSelected)
   {
     SelectBarBottle(barBottle, x0, y, TFT_COLOR_BACKGROUND);
   }
 
   // Clear current bottle type -> only if bottle type changed
-  if (!isDashboard && bottleChanged)
+  if (bottleChanged)
   {
     ClearBarBottle(lastDraw_barBottle, barBottle, x0, y, TFT_COLOR_BACKGROUND);
   }
   
   // Draw current bottle selection -> only if selected AND (full update OR bottle changed OR selected changed)
-  if (!isDashboard &&
-    isSelected &&
+  if (isSelected &&
     (isfullUpdate || bottleChanged || selectedChanged))
   {
     SelectBarBottle(barBottle, x0, y, TFT_COLOR_FOREGROUND);
@@ -821,13 +826,6 @@ void DisplayDriver::DrawBarPart(int16_t x0, int16_t y, MixtureLiquid liquid, Bar
   {
     // Draw bottle image
     DrawBarBottle(barBottle, x0, y);
-  
-    if (isDashboard && !isEmpty)
-    {
-      // Draw checkbox
-      bool backgroundColor = barBottle == eWhiteWine || barBottle == eSparklingWater;
-      _tft->drawRect(x0 - boxSize / 2, y + checkboxOffsetY, boxSize, boxSize, backgroundColor ? TFT_COLOR_BACKGROUND : TFT_COLOR_FOREGROUND);
-    }
   }
 
   // Draw liquid name -> only if full update, bottle type changed or selected changed
@@ -837,15 +835,6 @@ void DisplayDriver::DrawBarPart(int16_t x0, int16_t y, MixtureLiquid liquid, Bar
     _tft->setTextColor(color);
     _tft->fillRect(x0 - namesOffsetX - 17, y + namesOffsetY - 15, 54, 30, TFT_COLOR_BACKGROUND);
     DrawCenteredString(name, x0 - namesOffsetX, y + namesOffsetY);
-  }
-
-  // Draw checkbox infill -> only if full update, bottle type changed or selected changed
-  if (isDashboard &&
-    !isEmpty &&
-    (isfullUpdate || bottleChanged || selectedChanged))
-  {
-    // Draw checkbox infill
-    _tft->fillRect(x0 - boxSize / 2 + 4, y + checkboxOffsetY + 4, boxSize - 8, boxSize - 8, isSelected ? TFT_COLOR_STARTPAGE : TFT_COLOR_BACKGROUND);
   }
 
   // Draw sparkling water percentage -> only if any sparkling water is present and not beside itself
