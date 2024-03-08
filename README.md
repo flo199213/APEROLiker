@@ -6,7 +6,7 @@ You can download the 3D print files required for the assembly from Cults.
 Device | Link
 -------- | --------
 APEROLiker / HUGOliker: | <a href="https://cults3d.com/:1705298">https://cults3d.com/:1705298</a> 
-WINEBar:                | <a href="https://cults3d.com/:1705298">Coming Soon...</a>
+WINEBar:                | <a href="https://cults3d.com/:1841218">https://cults3d.com/:1841218</a>
  
 <img src="Images/APEROLiker_HUGOliker.jpg" width="650">
 
