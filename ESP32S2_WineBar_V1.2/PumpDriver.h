@@ -18,6 +18,16 @@
 
 
 //===============================================================
+// Defines
+//===============================================================
+#define DEFAULT_CYCLE_TIMESPAN_MS     (uint32_t)1000
+#define MIN_CYCLE_TIMESPAN_MS         (uint32_t)200
+#define MAX_CYCLE_TIMESPAN_MS         (uint32_t)1000
+
+#define KEY_CYCLETIMESPAN_MS          "CycleTimespan" // Key name: Maximum string length is 15 bytes, excluding a zero terminator.
+
+
+//===============================================================
 // Class for handling pump driver functions
 //===============================================================
 class PumpDriver
@@ -28,9 +38,15 @@ class PumpDriver
 
     // Initializes the pump driver
     void Begin(uint8_t pinPump1, uint8_t pinPump2, uint8_t pinPump3);
-    
+
     // Return the timestamp of the last user action
     uint32_t GetLastUserAction();
+    
+    // Load settings from EEPROM
+    void Load();
+
+    // Save settings to EEPROM
+    void Save();
 
     // Enables pump output
     void IRAM_ATTR Enable();
@@ -41,8 +57,14 @@ class PumpDriver
     // Return true, if the pumps are enabled. Otherwise false
     bool IsEnabled();
 
-    // Sets pumps on or off
-    void SetPumps(bool value1, bool value2, bool value3);
+    // Sets pumps from percentage (0-100%)
+    void SetPumps(double value1_Percentage, double value2_Percentage, double value3_Percentage);
+
+    // Sets the cycle timespan in ms (200-1000ms)
+    bool SetCycleTimespan(uint32_t value_ms);
+
+    // Returns the current cycle timespan
+    uint32_t GetCycleTimespan();
     
     // Should be called every < 50 ms
     void IRAM_ATTR Update();
@@ -57,11 +79,17 @@ class PumpDriver
     uint8_t _pinPump3;
 
     // Timing values
+    uint32_t _cycleTimespan_ms = DEFAULT_CYCLE_TIMESPAN_MS;
     bool _isPumpEnabled = false;
+    uint32_t _pwmPump1_ms = 0;
+    uint32_t _pwmPump2_ms = 0;
+    uint32_t _pwmPump3_ms = 0;
+
+    // Last variables for edge detection
+    bool _lastEnablePump1 = false;
+    bool _lastEnablePump2 = false;
+    bool _lastEnablePump3 = false;
     uint32_t _lastPumpCycleStart_ms = 0;
-    bool _enablePump1 = false;
-    bool _enablePump2 = false;
-    bool _enablePump3 = false;
     
     // Timestamp of last user action
     uint32_t _lastUserAction = 0;

@@ -51,7 +51,7 @@ enum MixerState : uint16_t
   eMenu = 0,
   eDashboard = 1,
   eCleaning = 2,
-  eReset = 3,
+  eBar = 3,
   eSettings = 4,
   eScreenSaver = 5,
 };
@@ -63,6 +63,15 @@ enum MixerEvent : uint16_t
   eExit = 2
 };
 
+enum BarBottle : uint16_t
+{
+  eSparklingWater = 0,
+  eEmpty = 1,
+  eRedWine = 2,
+  eWhiteWine = 3,
+  eRoseWine = 4,
+};
+const int BarBottleMax = 5;
 
 //===============================================================
 // Variant specific settings:

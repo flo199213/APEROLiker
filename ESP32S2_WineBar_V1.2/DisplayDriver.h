@@ -92,17 +92,16 @@ const unsigned char icon_eraser [] PROGMEM =
 	0x06, 0x80, 0x0f, 0x00, 0x0c, 0x00, 0x07, 0x00, 0x18, 0x00, 0x03, 0x00, 0x30, 0x80, 0x01, 0x00, 
 	0x60, 0xc0, 0x00, 0x00, 0xc0, 0xfb, 0x00, 0x00, 0x80, 0xff, 0xff, 0x7f, 0x00, 0x00, 0x00, 0x00
 };
-// 'reset', 32x32px
-const unsigned char icon_reset [] PROGMEM =
-{
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-	0x00, 0x00, 0xc0, 0x07, 0x00, 0x00, 0xe0, 0x0f, 0x00, 0x00, 0x78, 0x0c, 0x00, 0x00, 0x3c, 0x1c, 
-	0x00, 0x00, 0x0f, 0x38, 0x00, 0x80, 0x47, 0x30, 0x00, 0xe0, 0x61, 0x70, 0x00, 0x70, 0xe0, 0x60, 
-	0x00, 0x3c, 0xe4, 0x60, 0x00, 0x0e, 0xee, 0x70, 0x80, 0x0f, 0x4e, 0x3c, 0xc0, 0x1f, 0x0e, 0x1e, 
-	0xf0, 0x18, 0x8e, 0x07, 0x38, 0x38, 0xc0, 0x01, 0x1e, 0x30, 0xf0, 0x00, 0x06, 0x60, 0x38, 0x00, 
-	0x06, 0xe0, 0x1e, 0x00, 0x06, 0xc0, 0x07, 0x00, 0x0e, 0xc0, 0x03, 0x00, 0x1c, 0xe0, 0x00, 0x00, 
-	0x18, 0x78, 0x00, 0x00, 0x38, 0x1c, 0x00, 0x00, 0xfc, 0x3f, 0x00, 0x00, 0xfe, 0x3f, 0x00, 0x00, 
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+// 'cocktails', 32x32px
+const unsigned char icon_cocktails [] PROGMEM = {
+	0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0xc0, 0x02, 0x00, 0x00, 0xa0, 0x01, 0x00, 0x3e, 0xd0, 0x00, 
+	0x00, 0x7f, 0x50, 0x00, 0x80, 0xb7, 0x30, 0x00, 0xc0, 0x55, 0x21, 0x00, 0xc0, 0xff, 0x39, 0x00, 
+	0xc0, 0xfc, 0xff, 0x01, 0xc0, 0x0f, 0x1a, 0x01, 0xc0, 0xed, 0x7f, 0x01, 0x80, 0xaf, 0x43, 0x01, 
+	0x00, 0xaf, 0x42, 0x01, 0x00, 0xae, 0x44, 0x01, 0x00, 0xb8, 0xc3, 0x00, 0x00, 0x30, 0xc0, 0x00, 
+	0x00, 0x70, 0xe0, 0x00, 0x00, 0x50, 0xa0, 0x00, 0x00, 0x50, 0xa0, 0x00, 0x00, 0x50, 0xa0, 0x00, 
+	0x00, 0x50, 0xe0, 0x00, 0x00, 0x70, 0xe0, 0x00, 0x00, 0x60, 0x60, 0x00, 0x00, 0x60, 0x60, 0x00, 
+	0x00, 0x60, 0x60, 0x00, 0x00, 0xe0, 0x70, 0x00, 0x00, 0xa0, 0x5f, 0x00, 0x00, 0xa0, 0x5f, 0x00, 
+	0x00, 0xa0, 0x50, 0x00, 0x00, 0xa0, 0x5f, 0x00, 0x00, 0x20, 0x40, 0x00, 0x00, 0xc0, 0x3f, 0x00
 };
 // 'settings', 32x32px
 const unsigned char icon_settings [] PROGMEM =
@@ -186,6 +185,12 @@ class DisplayDriver
 
     // Sets the cleaning liquid value
     void SetCleaningLiquid(MixtureLiquid liquid);
+    
+    // Sets the percentage values
+    void SetPercentages(int16_t liquid1_Percentage, int16_t liquid2_Percentage, int16_t liquid3_Percentage);
+
+    // Sets the bar stock
+    void SetBar(BarBottle barBottle1, BarBottle barBottle2, BarBottle barBottle3);
 
     // Shows intro page
     void ShowIntroPage();
@@ -202,6 +207,9 @@ class DisplayDriver
     // Shows cleaning page
     void ShowCleaningPage();
 
+    // Shows bar page
+    void ShowBarPage();
+
     // Shows settings page
     void ShowSettingsPage();
     
@@ -217,8 +225,11 @@ class DisplayDriver
     // Draws the menu partially
     void DrawMenu(bool isfullUpdate = false);
 
+    // Draw bar
+    void DrawBar(bool isDashboard, bool isfullUpdate = false);
+
     // Draw checkboxes
-    void DrawCheckBoxes(MixtureLiquid liquid, bool bottles = false, bool isfullUpdate = false);
+    void DrawCheckBoxes(MixtureLiquid liquid);
 
     // Draws settings partially
     void DrawSettings(bool isfullUpdate = false);
@@ -245,10 +256,28 @@ class DisplayDriver
     // Current mixture settings
     MixerState _menuState = eDashboard;
     MixtureLiquid _dashboardLiquid = eLiquid1;
+    int16_t _liquid1_Percentage = 50; // 0% to 95% for wine spritzer
+    int16_t _liquid2_Percentage = 50; // 0% to 95% for wine spritzer
+    int16_t _liquid3_Percentage = 50; // 0% to 95% for wine spritzer
+    
+    // Cleaning mode settings
     MixtureLiquid _cleaningLiquid = eLiquidAll;
+    
+    // Bar settings
+    BarBottle _barBottle1 = eRedWine;
+    BarBottle _barBottle2 = eWhiteWine;
+    BarBottle _barBottle3 = eRoseWine;
         
     // Last draw values
     MixerState _lastDraw_MenuState = eDashboard;
+    MixtureLiquid _lastDraw_SelectedLiquid = eLiquidNone;
+    BarBottle _lastDraw_barBottle1 = eEmpty;
+    BarBottle _lastDraw_barBottle2 = eEmpty;
+    BarBottle _lastDraw_barBottle3 = eEmpty;
+    int16_t _lastDraw_liquid1_Percentage = 0;
+    int16_t _lastDraw_liquid2_Percentage = 0;
+    int16_t _lastDraw_liquid3_Percentage = 0;
+    uint32_t _lastDraw_cycleTimespan_ms = 0;
     wifi_mode_t _lastDraw_wifiMode = WIFI_MODE_NULL;
     uint16_t _lastDraw_ConnectedClients = 0;
     
@@ -264,18 +293,33 @@ class DisplayDriver
     
     // Draws header Text
     void DrawHeader(const String &text, bool withIcons = true);
-    
-    // Draws a string centered
-    void DrawCenteredString(const String &text, int16_t x, int16_t y, bool underlined, uint16_t lineColor);
-    
-    // Formats double value
-    String FormatValue(double value, int mainPlaces, int decimalPlaces);
 
     // Draws a star
     void DrawStar(int16_t x0, int16_t y0, bool fullStars, uint16_t color, int16_t size = 0);
 
     // Draws a star tail
     void DrawStarTail(int16_t x0, int16_t y0, int16_t start, int16_t end, bool fullStars, uint16_t color);
+    
+    // Draws a part of the bar
+    void DrawBarPart(int16_t x0, int16_t y, MixtureLiquid liquid, BarBottle barBottle, BarBottle lastDraw_barBottle, int16_t liquid_Percentage, int16_t lastDraw_liquid_Percentage, String name, uint16_t color, bool isDashboard, bool isfullUpdate);
+    
+    // Clears the difference from a bar bottle to the next bottle
+    void ClearBarBottle(BarBottle lastDraw_barBottle, BarBottle barBottle, int16_t x0, int16_t y, uint16_t clearColor);
+
+    // Draws a bar bottle
+    void DrawBarBottle(BarBottle barBottle, int16_t x0, int16_t y);
+
+    // Draws a selection around a bar bottle
+    void SelectBarBottle(BarBottle barBottle, int16_t x0, int16_t y, uint16_t color);
+
+    // Returns a pointer to the requested bar bottle image
+    SPIFFSImage* GetBarBottlePointer(BarBottle barBottle);
+    
+    // Draws a string centered
+    void DrawCenteredString(const String &text, int16_t x, int16_t y, bool underlined = false, bool backGround = false, uint16_t lineColor = 0, uint16_t backGroundColor = 0);
+    
+    // Formats double value
+    String FormatValue(double value, int mainPlaces, int decimalPlaces);
 };
 
 

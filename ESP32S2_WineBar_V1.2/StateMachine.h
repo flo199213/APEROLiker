@@ -57,9 +57,17 @@ class StateMachine
 
     // Dashboard mode settings
     MixtureLiquid _dashboardLiquid = eLiquid1;
+    int16_t _liquid1_Percentage = 50; // 0% to 95% for wine spritzer
+    int16_t _liquid2_Percentage = 50; // 0% to 95% for wine spritzer
+    int16_t _liquid3_Percentage = 50; // 0% to 95% for wine spritzer
 
     // Cleaning mode settings
     MixtureLiquid _cleaningLiquid = eLiquidAll;
+
+    // Bar settings
+    BarBottle _barBottle1 = eRedWine;
+    BarBottle _barBottle2 = eWhiteWine;
+    BarBottle _barBottle3 = eRoseWine;
 
     // Timer variables for reset counter
     uint32_t _resetTimestamp = 0;
@@ -74,8 +82,8 @@ class StateMachine
     // Function cleaning state
     void FctCleaning(MixerEvent event);
 
-    // Function reset state
-    void FctReset(MixerEvent event);
+    // Function bar state
+    void FctBar(MixerEvent event);
 
     // Function settings state
     void FctSettings(MixerEvent event);
@@ -83,11 +91,8 @@ class StateMachine
     // Function screen saver state
     void FctScreenSaver(MixerEvent event);
     
-    // Resets the mixture to default recipe
-    void SetMixtureDefaults();
-
-    // Updates all values in display, pumps driver and wifi
-    void UpdateValues(uint32_t clientID = 0);
+    // Updates all values in display and pumps driver
+    void UpdateValues();
 };
 
 
