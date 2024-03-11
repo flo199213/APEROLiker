@@ -44,10 +44,10 @@ class WifiHandler
     // Initializes the wifi handler
     void Begin();
 
-    // Load values from EEPROM
+    // Load values from flash
     void Load();
 
-    // Save values to EEPROM
+    // Save values to flash
     void Save();
 
     // Returns the current wifi mode

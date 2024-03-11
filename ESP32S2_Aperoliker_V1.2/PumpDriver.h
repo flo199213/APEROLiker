@@ -42,10 +42,10 @@ class PumpDriver
     // Return the timestamp of the last user action
     uint32_t GetLastUserAction();
     
-    // Load settings from EEPROM
+    // Load settings from flash
     void Load();
 
-    // Save settings to EEPROM
+    // Save settings to flash
     void Save();
 
     // Enables pump output

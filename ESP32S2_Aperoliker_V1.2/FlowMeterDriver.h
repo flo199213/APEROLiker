@@ -35,11 +35,14 @@ class FlowMeterDriver
     // Constructor
     FlowMeterDriver();
     
-    // Load settings from EEPROM
+    // Load settings from flash
     void Load();
 
-    // Save settings to EEPROM
+    // Save settings to flash
     void Save();
+
+    // Save settings to flash if async request is pending
+    void SaveAsync();
 
     // Returns current flow meter values
     double GetValueLiquid1();
@@ -48,6 +51,9 @@ class FlowMeterDriver
 
     // Adds flow time (@100% pump power) to flow meter
     void IRAM_ATTR AddFlowTime(uint32_t valueLiquid1_ms, uint32_t valueLiquid2_ms, uint32_t valueLiquid3_ms);
+
+    // Requests a save values from interrupt service routine
+    void IRAM_ATTR RequestSaveAsync();
     
   private:
     // Flow meter variables
@@ -55,6 +61,8 @@ class FlowMeterDriver
     double _valueLiquid1_L;
     double _valueLiquid2_L;
     double _valueLiquid3_L;
+    
+    bool _isSavePending = false;
 };
 
 

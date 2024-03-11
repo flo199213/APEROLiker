@@ -21,7 +21,7 @@ FlowMeterDriver::FlowMeterDriver()
 }
 
 //===============================================================
-// Load settings from EEPROM
+// Load settings from flash
 //===============================================================
 void FlowMeterDriver::Load()
 {
@@ -35,7 +35,7 @@ void FlowMeterDriver::Load()
 }
 
 //===============================================================
-// Save settings to EEPROM
+// Save settings to flash
 //===============================================================
 void FlowMeterDriver::Save()
 {
@@ -45,6 +45,19 @@ void FlowMeterDriver::Save()
     _preferences.putDouble(KEY_FLOW_LIQUID2, _valueLiquid2_L);
     _preferences.putDouble(KEY_FLOW_LIQUID3, _valueLiquid3_L); 
     _preferences.end();
+  }
+}
+
+//===============================================================
+// Returns true, if a save call is pending to be executed by the
+// loop task
+//===============================================================
+void FlowMeterDriver::SaveAsync()
+{
+  if (_isSavePending)
+  {
+    _isSavePending = false;
+    Save();
   }
 }
 
@@ -80,4 +93,12 @@ void FlowMeterDriver::AddFlowTime(uint32_t valueLiquid1_ms, uint32_t valueLiquid
   _valueLiquid1_L += (double)valueLiquid1_ms * FLOWRATE;
   _valueLiquid2_L += (double)valueLiquid2_ms * FLOWRATE;
   _valueLiquid3_L += (double)valueLiquid3_ms * FLOWRATE;
+}
+
+//===============================================================
+// Requests a save values from interrupt service routine
+//===============================================================
+void FlowMeterDriver::RequestSaveAsync()
+{
+  _isSavePending = true;
 }

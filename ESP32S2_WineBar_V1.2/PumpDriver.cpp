@@ -49,7 +49,7 @@ uint32_t PumpDriver::GetLastUserAction()
 }
 
 //===============================================================
-// Load settings from EEPROM
+// Load settings from flash
 //===============================================================
 void PumpDriver::Load()
 {
@@ -62,7 +62,7 @@ void PumpDriver::Load()
 }
 
 //===============================================================
-// Save settings to EEPROM
+// Save settings to flash
 //===============================================================
 void PumpDriver::Save()
 {

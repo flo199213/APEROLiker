@@ -40,7 +40,7 @@ void WifiHandler::Begin()
 }
 
 //===============================================================
-// Load values from EEPROM
+// Load values from flash
 //===============================================================
 void WifiHandler::Load()
 {
@@ -52,7 +52,7 @@ void WifiHandler::Load()
 }
 
 //===============================================================
-// Save values to EEPROM
+// Save values to flash
 //===============================================================
 void WifiHandler::Save()
 {

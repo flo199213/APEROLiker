@@ -114,8 +114,8 @@ void IRAM_ATTR ISR_Pumps_Enable()
     // Disable pump power
     Pumps.Disable();
 
-    // Save current flow values to EEPROM
-    FlowMeter.Save();
+    // Request save flow values to flash
+    FlowMeter.RequestSaveAsync();
   }
   else
   {
@@ -312,6 +312,9 @@ void loop()
 
   // Update pump outputs
   Pumps.Update();
+
+  // Save flow meter values to flash if requested
+  FlowMeter.SaveAsync();
 
 #if defined(WIFI_MIXER)
   // Update wifi, webserver and clients
