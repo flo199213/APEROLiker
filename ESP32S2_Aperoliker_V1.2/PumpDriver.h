@@ -20,7 +20,7 @@
 //===============================================================
 // Defines
 //===============================================================
-#define DEFAULT_CYCLE_TIMESPAN_MS     (uint32_t)1000
+#define DEFAULT_CYCLE_TIMESPAN_MS     (uint32_t)500
 #define MIN_CYCLE_TIMESPAN_MS         (uint32_t)200
 #define MAX_CYCLE_TIMESPAN_MS         (uint32_t)1000
 
