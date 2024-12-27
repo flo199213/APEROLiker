@@ -23,6 +23,7 @@
 #include "Config.h"
 #include "StateMachine.h"
 
+
 #if defined(WIFI_MIXER)
 
 //===============================================================
@@ -75,7 +76,7 @@ class WifiHandler
     Preferences _preferences;
     
     // Wifi settings
-    wifi_mode_t _initWifiMode = WIFI_MODE_AP;
+    wifi_mode_t _initWifiMode = WIFI_MODE_NULL;
     wifi_mode_t _wifiMode = WIFI_MODE_NULL;
 
     // SSID and Password

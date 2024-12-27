@@ -151,10 +151,10 @@ void EncoderButtonDriver::DoEncoderA()
   {
     _A_set = !_A_set;
     
-    // Adjust counter -1 if A leads B
+    // Adjust counter if A leads B in positive direction
     if (_A_set && !_B_set) 
     {
-      _encoderIncrements = _encoderIncrements - 1;
+      _encoderIncrements = _encoderIncrements + ENCODER_DIRECTION;
     }
   }
 }
@@ -168,10 +168,10 @@ void EncoderButtonDriver::DoEncoderB()
   {
     _B_set = !_B_set;
     
-    //  Adjust counter +1 if B leads A
+    // Adjust counter if B leads A in negative direction
     if (_B_set && !_A_set) 
     {
-      _encoderIncrements = _encoderIncrements + 1;
+      _encoderIncrements = _encoderIncrements - ENCODER_DIRECTION;
     }
   }
 }

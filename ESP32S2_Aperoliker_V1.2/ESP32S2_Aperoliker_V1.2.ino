@@ -79,6 +79,7 @@
 
 // LED pin defines
 #define PIN_LEDLIGHT            6     // GPIO 6  -> power LEDs
+#define PIN_LEDSTATUS           7     // GPIO 7  -> status LED
 
 // Intro defines
 #define INTRO_TIME_MS           3000  // Wait for 3 seconds at startup and show intro page
@@ -194,11 +195,13 @@ void setup(void)
   pinMode(PIN_PUMPS_ENABLE, INPUT_PULLUP);
   pinMode(PIN_PUMPS_ENABLE_GND, OUTPUT);
   pinMode(PIN_LEDLIGHT, OUTPUT);
+  pinMode(PIN_LEDSTATUS, OUTPUT);
   pinMode(PIN_BUZZER, OUTPUT);
 
   // Initialize outputs
   digitalWrite(PIN_PUMPS_ENABLE_GND, LOW); // Fixed GND value (0V, LOW)
   digitalWrite(PIN_LEDLIGHT, LOW);
+  digitalWrite(PIN_LEDSTATUS, LOW);
   digitalWrite(PIN_BUZZER, LOW);
 
   // Play startup sound
@@ -290,6 +293,9 @@ void loop()
 
     // Print memory information
     Serial.println(GetMemoryInfoString());
+
+    // Toggle status LED
+    digitalWrite(PIN_LEDSTATUS, !digitalRead(PIN_LEDSTATUS));
   }
 
   // Flash LED light if dispensing is in progress
