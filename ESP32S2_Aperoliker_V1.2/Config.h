@@ -24,6 +24,7 @@
 
 // Define one of these or none for generic colors
 #define APEROLIKER
+//#define APEROLIC
 //#define HUGOLIKER
 //#define WILDBERRY
 
@@ -114,6 +115,50 @@ const String startupImageLogo = "/LogoAperoliker.bmp";
 #define TFT_GLASS_POS_Y                   85
 #define TFT_BOTTLE_POS_X                  40
 #define TFT_BOTTLE_POS_Y                  5
+
+
+//===============================================================
+#elif defined(APEROLIC)
+
+// Draw setting
+#define MIXER_NAME                        "APEROLic"    // Should not exceed 15 characters and be a single word -> will be the dns name in lower case and without white spaces for example "http://aperolic.local/"
+#define LIQUID1_NAME                      "Aperol"        // Should not exceed 8 characters
+#define LIQUID2_NAME                      "Soda"          // Should not exceed 8 characters
+#define LIQUID3_NAME                      "Prosecco"      // Should not exceed 8 characters
+
+// Color defines
+#define TFT_COLOR_STARTPAGE               ST77XX_ORANGE
+#define TFT_COLOR_STARTPAGE_FOREGROUND    0xDF9E
+#define TFT_COLOR_STARTPAGE_BACKGROUND    0xA6DC
+#define TFT_COLOR_TEXT_HEADER             ST77XX_ORANGE
+#define TFT_COLOR_TEXT_BODY               ST77XX_WHITE
+#define TFT_COLOR_INFOBOX_BORDER          ST77XX_ORANGE
+#define TFT_COLOR_INFOBOX_FOREGROUND      ST77XX_ORANGE
+#define TFT_COLOR_INFOBOX_BACKGROUND      ST77XX_WHITE
+#define TFT_COLOR_MENU_SELECTOR           ST77XX_ORANGE
+#define TFT_COLOR_LIQUID_1                ST77XX_ORANGE
+#define TFT_COLOR_LIQUID_2                0x0F1F
+#define TFT_COLOR_LIQUID_3                0x0390
+#define TFT_COLOR_FOREGROUND              ST77XX_WHITE
+#define TFT_COLOR_BACKGROUND              ST77XX_BLACK
+
+#define WIFI_COLOR_LIQUID_1               0xFE5000
+#define WIFI_COLOR_LIQUID_2               0x01FFFF
+#define WIFI_COLOR_LIQUID_3               0x00E784
+
+// Startup image
+const String startupImageBottle = "/BottleAperolic.bmp";
+const String startupImageGlass = "/GlassAperolic.bmp";
+const String startupImageLogo = "/LogoAperolic.bmp";
+
+#define TFT_TRANSPARENCY_COLOR            0x07E0
+#define TFT_LOGO_POS_X                    0
+#define TFT_LOGO_POS_Y                    25
+#define TFT_GLASS_POS_X                   140
+#define TFT_GLASS_POS_Y                   85
+#define TFT_BOTTLE_POS_X                  40
+#define TFT_BOTTLE_POS_Y                  5
+
 
 //===============================================================
 #elif defined(HUGOLIKER)
