@@ -81,6 +81,10 @@
 #define PIN_LEDLIGHT            6     // GPIO 6  -> power LEDs
 #define PIN_LEDSTATUS           7     // GPIO 7  -> status LED
 
+// Voltage measurement defines
+#define PIN_VCC                 3     // GPIO 3  -> VCC voltage Aperoliker PCB
+#define VCC_CONVERSION_FACTOR   0.00766666666666666666666666666667
+
 // Intro defines
 #define INTRO_TIME_MS           3000  // Wait for 3 seconds at startup and show intro page
 
@@ -197,6 +201,7 @@ void setup(void)
   pinMode(PIN_LEDLIGHT, OUTPUT);
   pinMode(PIN_LEDSTATUS, OUTPUT);
   pinMode(PIN_BUZZER, OUTPUT);
+  pinMode(PIN_VCC, INPUT);
 
   // Initialize outputs
   digitalWrite(PIN_PUMPS_ENABLE_GND, LOW); // Fixed GND value (0V, LOW)
@@ -219,6 +224,9 @@ void setup(void)
 
   // Initialize flow values from EEPROM
   FlowMeter.Load();
+
+  // Get VCC voltage (Only for Aperoliker PCB)
+  double vccVoltage = analogReadMilliVolts(PIN_VCC) * VCC_CONVERSION_FACTOR;
   
   // Initialize pump driver
   Pumps.Begin(PIN_PUMP_1, PIN_PUMP_2, PIN_PUMP_3);
