@@ -747,11 +747,10 @@ void StateMachine::FctScreenSaver(MixerEvent event)
 //===============================================================
 void StateMachine::SetMixtureDefaults()
 { 
-  // Set mixture to:
-  // Aperol: 34%, Soda: 16%, Prosecco: 50% (Official Aperol recipe)
-  _liquid1Angle_Degrees = 0;                                                  // 33,33%
-  _liquid2Angle_Degrees = _liquid1Angle_Degrees + 120;                        // 15,83%
-  _liquid3Angle_Degrees = _liquid1Angle_Degrees + _liquid2Angle_Degrees + 57; // 50,84%
+  // Set mixture to default
+  _liquid1Angle_Degrees = LIQUID1ANGLE_DEGREES;
+  _liquid2Angle_Degrees = LIQUID2ANGLE_DEGREES;
+  _liquid3Angle_Degrees = LIQUID3ANGLE_DEGREES;
 }
 
 //===============================================================

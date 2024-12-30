@@ -23,12 +23,15 @@ PumpDriver::PumpDriver()
 //===============================================================
 // Initializes the pump driver
 //===============================================================
-void PumpDriver::Begin(uint8_t pinPump1, uint8_t pinPump2, uint8_t pinPump3)
+void PumpDriver::Begin(uint8_t pinPump1, uint8_t pinPump2, uint8_t pinPump3, double vccVoltage)
 {
   // Set pins
   _pinPump1 = pinPump1;
   _pinPump2 = pinPump2;
   _pinPump3 = pinPump3;
+
+  // Save VCC voltage
+  _vccVoltage = vccVoltage;
 
   // Load settings
   Pumps.Load();

@@ -268,7 +268,7 @@ bool WifiHandler::StartWebServer()
   WiFi.softAPConfig(local_ip, gateway, subnet);
   delay(100);
 
-  // Set up mDNS responder to mixer name, e.g. http://aperoliker.local
+  // Set up mDNS responder to mixer name, e.g. http://mixer.local
   String mdnsName = MIXER_NAME;
   mdnsName.toLowerCase();
   mdnsName.trim();
@@ -313,7 +313,7 @@ bool WifiHandler::StartWebServer()
   // Add not found handler to web server
   _webserver->onNotFound([](AsyncWebServerRequest *request)
   {
-    request->send(404, "text/plain", "Sorry, page not found! Go to 'http://" + String(MIXER_NAME) + ".local' or 'http://192.168.1.1/'");
+    request->send(404, "text/plain", "Sorry, page not found! Go to 'http://" + mdnsName + ".local' or 'http://192.168.1.1/'");
   });
 
   // Add websocket handler to web server

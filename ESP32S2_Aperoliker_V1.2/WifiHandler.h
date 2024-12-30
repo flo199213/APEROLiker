@@ -81,8 +81,8 @@ class WifiHandler
 
     // SSID and Password
     const char* _ssid = MIXER_NAME;
-    const char* _password = "mixer1234";
-    
+    const char* _password = MIXER_PASSWORD;
+
     // Web server variables
     std::unique_ptr<AsyncWebServer> _webserver;
     std::unique_ptr<AsyncWebSocket> _websocket;

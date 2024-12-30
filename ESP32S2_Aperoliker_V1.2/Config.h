@@ -77,11 +77,20 @@ enum MixerEvent : uint16_t
 //===============================================================
 #if defined(APEROLIKER)
 
-// Draw setting
+// Wifi Settings
 #define MIXER_NAME                        "APEROLiker"    // Should not exceed 15 characters and be a single word -> will be the dns name in lower case and without white spaces for example "http://aperoliker.local/"
+#define MIXER_PASSWORD                    "mixer1234"     // Should not exceed 15 characters
+
+// Draw setting
 #define LIQUID1_NAME                      "Aperol"        // Should not exceed 8 characters
 #define LIQUID2_NAME                      "Soda"          // Should not exceed 8 characters
 #define LIQUID3_NAME                      "Prosecco"      // Should not exceed 8 characters
+
+// Mixture default setting
+// Aperol: 34%, Soda: 16%, Prosecco: 50% (Official Aperol recipe)
+#define LIQUID1ANGLE_DEGREES              0     //   0° -> 120° ( / 360°) = 33,33%
+#define LIQUID2ANGLE_DEGREES              120   // 120° -> 177° ( / 360°) = 15,83%
+#define LIQUID3ANGLE_DEGREES              177   // 177° -> 360° ( / 360°) = 50,84%
 
 // Color defines
 #define TFT_COLOR_STARTPAGE               ST77XX_ORANGE
@@ -120,11 +129,20 @@ const String startupImageLogo = "/LogoAperoliker.bmp";
 //===============================================================
 #elif defined(APEROLIC)
 
+// Wifi Settings
+#define MIXER_NAME                        "APEROLic"      // Should not exceed 15 characters and be a single word -> will be the dns name in lower case and without white spaces for example "http://aperolic.local/"
+#define MIXER_PASSWORD                    "mixer1234"     // Should not exceed 15 characters
+
 // Draw setting
-#define MIXER_NAME                        "APEROLic"    // Should not exceed 15 characters and be a single word -> will be the dns name in lower case and without white spaces for example "http://aperolic.local/"
 #define LIQUID1_NAME                      "Aperol"        // Should not exceed 8 characters
 #define LIQUID2_NAME                      "Soda"          // Should not exceed 8 characters
 #define LIQUID3_NAME                      "Prosecco"      // Should not exceed 8 characters
+
+// Mixture default setting
+// Aperol: 34%, Soda: 16%, Prosecco: 50% (Official Aperol recipe)
+#define LIQUID1ANGLE_DEGREES              0     //   0° -> 120° ( / 360°) = 33,33%
+#define LIQUID2ANGLE_DEGREES              120   // 120° -> 177° ( / 360°) = 15,83%
+#define LIQUID3ANGLE_DEGREES              177   // 177° -> 360° ( / 360°) = 50,84%
 
 // Color defines
 #define TFT_COLOR_STARTPAGE               ST77XX_ORANGE
@@ -163,11 +181,19 @@ const String startupImageLogo = "/LogoAperolic.bmp";
 //===============================================================
 #elif defined(HUGOLIKER)
 
-// Draw setting
+// Wifi Settings
 #define MIXER_NAME                        "HUGOliker"     // Should not exceed 15 characters and be a single word -> will be the dns name in lower case and without white spaces for example "http://hugoliker.local/"
+#define MIXER_PASSWORD                    "mixer1234"     // Should not exceed 15 characters
+
+// Draw setting
 #define LIQUID1_NAME                      "Syrup"         // Should not exceed 8 characters
 #define LIQUID2_NAME                      "Soda"          // Should not exceed 8 characters
 #define LIQUID3_NAME                      "Prosecco"      // Should not exceed 8 characters
+
+// Mixture default setting
+#define LIQUID1ANGLE_DEGREES              0     //   0° -> 120° ( / 360°) = 33,33%
+#define LIQUID2ANGLE_DEGREES              120   // 120° -> 177° ( / 360°) = 15,83%
+#define LIQUID3ANGLE_DEGREES              177   // 177° -> 360° ( / 360°) = 50,84%
 
 // Color defines
 #define TFT_COLOR_STARTPAGE               ST77XX_YELLOW
@@ -202,14 +228,23 @@ const String startupImageLogo = "/LogoHugoliker.bmp";
 #define TFT_BOTTLE_POS_X                  40
 #define TFT_BOTTLE_POS_Y                  5
 
+
 //===============================================================
 #elif defined(WILDBERRY)
 
-// Draw setting
+// Wifi Settings
 #define MIXER_NAME                        "WILDBerry"     // Should not exceed 15 characters and be a single word -> will be the dns name in lower case and without white spaces for example "http://wildberry.local/"
+#define MIXER_PASSWORD                    "mixer1234"     // Should not exceed 15 characters
+
+// Draw setting
 #define LIQUID1_NAME                      "WildBerry"     // Should not exceed 8 characters
 #define LIQUID2_NAME                      "Lillet"        // Should not exceed 8 characters
 #define LIQUID3_NAME                      "Prosecco"      // Should not exceed 8 characters
+
+// Mixture default setting
+#define LIQUID1ANGLE_DEGREES              0     //   0° -> 177° ( / 360°) = 50,84% 
+#define LIQUID2ANGLE_DEGREES              177   // 177° -> 240° ( / 360°) = 15,83%
+#define LIQUID3ANGLE_DEGREES              240   // 240° -> 360° ( / 360°) = 33,33%
 
 // Color defines
 #define TFT_COLOR_STARTPAGE               ST77XX_MAGENTA
@@ -244,14 +279,23 @@ const String startupImageLogo = "/LogoWildBerry.bmp";
 #define TFT_BOTTLE_POS_X                  40
 #define TFT_BOTTLE_POS_Y                  5
 
+
 //===============================================================
 #else
 
-// Draw setting
+// Wifi Settings
 #define MIXER_NAME                        "Cocktailmixer"   // Should not exceed 15 characters and be a single word -> will be the dns name in lower case and without white spaces for example "http://cocktailmixer.local/"
+#define MIXER_PASSWORD                    "mixer1234"       // Should not exceed 15 characters
+
+// Draw setting
 #define LIQUID1_NAME                      "Liquid 1"        // Should not exceed 8 characters
 #define LIQUID2_NAME                      "Liquid 2"        // Should not exceed 8 characters
 #define LIQUID3_NAME                      "Liquid 3"        // Should not exceed 8 characters
+
+// Mixture default setting
+#define LIQUID1ANGLE_DEGREES              0     //   0° -> 120° ( / 360°) = 33,33%
+#define LIQUID2ANGLE_DEGREES              120   // 120° -> 240° ( / 360°) = 33,33%
+#define LIQUID3ANGLE_DEGREES              240   // 240° -> 360° ( / 360°) = 33,33%
 
 // Color defines
 #define TFT_COLOR_STARTPAGE               ST77XX_RED

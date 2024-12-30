@@ -1,5 +1,5 @@
 /**
- * Aperoliker main file
+ * Cocktail mixer main file
  *
  * @author    Florian Staeblein
  * @date      2024/01/28
@@ -28,7 +28,7 @@
  * after booting via USB. This means that the microcontroller can
  * be programmed via the Arduino Ide WITHOUT having to press the 
  * "BOOT" and "RESET" buttons again. (This allows the housing of
- * the Aperoliker/Hugoliker to be closed).
+ * to remain closed).
  * 
  * ==============================================================
  */
@@ -82,8 +82,8 @@
 #define PIN_LEDSTATUS           7     // GPIO 7  -> status LED
 
 // Voltage measurement defines
-#define PIN_VCC                 3     // GPIO 3  -> VCC voltage Aperoliker PCB
-#define VCC_CONVERSION_FACTOR   0.00766666666666666666666666666667
+#define PIN_VCC                 3     // GPIO 3  -> VCC voltage Custom PCB
+#define VCC_CONVERSION_FACTOR   0.00766666666666666666666666666667 // 0-3.3V -> 0-25V
 
 // Intro defines
 #define INTRO_TIME_MS           3000  // Wait for 3 seconds at startup and show intro page
@@ -225,11 +225,11 @@ void setup(void)
   // Initialize flow values from EEPROM
   FlowMeter.Load();
 
-  // Get VCC voltage (Only for Aperoliker PCB)
+  // Get VCC voltage (Only for Custom PCB)
   double vccVoltage = analogReadMilliVolts(PIN_VCC) * VCC_CONVERSION_FACTOR;
   
   // Initialize pump driver
-  Pumps.Begin(PIN_PUMP_1, PIN_PUMP_2, PIN_PUMP_3);
+  Pumps.Begin(PIN_PUMP_1, PIN_PUMP_2, PIN_PUMP_3, vccVoltage);
 
   // Initialize state machine
   Statemachine.Begin(PIN_BUZZER);

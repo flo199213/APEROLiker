@@ -37,7 +37,7 @@ class PumpDriver
     PumpDriver();
 
     // Initializes the pump driver
-    void Begin(uint8_t pinPump1, uint8_t pinPump2, uint8_t pinPump3);
+    void Begin(uint8_t pinPump1, uint8_t pinPump2, uint8_t pinPump3, double vccVoltage);
 
     // Return the timestamp of the last user action
     uint32_t GetLastUserAction();
@@ -77,6 +77,9 @@ class PumpDriver
     uint8_t _pinPump1;
     uint8_t _pinPump2;
     uint8_t _pinPump3;
+
+    // VCC voltage
+    double _vccVoltage;
 
     // Timing values
     uint32_t _cycleTimespan_ms = DEFAULT_CYCLE_TIMESPAN_MS;
