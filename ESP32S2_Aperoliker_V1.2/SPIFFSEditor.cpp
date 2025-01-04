@@ -302,7 +302,7 @@ SPIFFSEditor::SPIFFSEditor() :
 //===============================================================
 // Returns true, if the handler can handle the request
 //===============================================================
-bool SPIFFSEditor::canHandle(AsyncWebServerRequest *request)
+bool SPIFFSEditor::canHandle(AsyncWebServerRequest* request) const
 {
   if (request->url().equalsIgnoreCase("/edit"))
   {
@@ -360,7 +360,7 @@ bool SPIFFSEditor::canHandle(AsyncWebServerRequest *request)
 //===============================================================
 // Handles the request
 //===============================================================
-void SPIFFSEditor::handleRequest(AsyncWebServerRequest *request)
+void SPIFFSEditor::handleRequest(AsyncWebServerRequest* request)
 {
   if (request->method() == HTTP_GET)
   {

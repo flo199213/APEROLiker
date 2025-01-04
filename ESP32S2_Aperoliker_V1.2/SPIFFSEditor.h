@@ -28,20 +28,20 @@ class SPIFFSEditor: public AsyncWebHandler
     SPIFFSEditor();
 
     // Returns true, if the handler can handle the request
-    virtual bool canHandle(AsyncWebServerRequest *request) override final;
-
+    bool canHandle(AsyncWebServerRequest* request) const override final;
+    
     // Handles the request
-    virtual void handleRequest(AsyncWebServerRequest *request) override final;
+    void handleRequest(AsyncWebServerRequest* request) override final;
     
     // Handles the upload
-    virtual void handleUpload(AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final) override final;
+    void handleUpload(AsyncWebServerRequest* request, const String& filename, size_t index, uint8_t* data, size_t len, bool final) override final;
     
     // Returns false
-    virtual bool isRequestHandlerTrivial() override final 
+    bool isRequestHandlerTrivial() const override final
     {
       return false;
-    };
-
+    }
+    
   private:
     uint32_t _startTime;
 };
