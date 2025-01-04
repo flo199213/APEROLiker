@@ -313,7 +313,10 @@ bool WifiHandler::StartWebServer()
   // Add not found handler to web server
   _webserver->onNotFound([](AsyncWebServerRequest *request)
   {
-    request->send(404, "text/plain", "Sorry, page not found! Go to 'http://" + mdnsName + ".local' or 'http://192.168.1.1/'");
+    String mixerName = MIXER_NAME;
+    mixerName.toLowerCase();
+    mixerName.trim();
+    request->send(404, "text/plain", "Sorry, page not found! Go to 'http://" + mixerName + ".local' or 'http://192.168.1.1/'");
   });
 
   // Add websocket handler to web server
