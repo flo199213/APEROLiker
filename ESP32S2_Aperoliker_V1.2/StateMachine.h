@@ -14,6 +14,7 @@
 //===============================================================
 #include <Arduino.h>
 #include <WiFi.h>
+#include <esp_log.h>
 #include "Config.h"
 #include "AngleHelper.h"
 #include "EncoderButtonDriver.h"

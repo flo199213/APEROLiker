@@ -12,6 +12,11 @@
 #include "SystemHelper.h"
 
 //===============================================================
+// Constants
+//===============================================================
+static const char* TAG = "systemhelper";
+
+//===============================================================
 // Global variables
 //===============================================================
 SystemHelper Systemhelper;
@@ -22,15 +27,19 @@ SystemHelper Systemhelper;
 void SystemHelper::Begin()
 {
   // Log startup info
+  ESP_LOGI(TAG, "Begin initializing system helper");
 
   // Show system information
+  ESP_LOGI(TAG, "%s", GetSystemInfoString().c_str());
 
   // Print restart reason
+  ESP_LOGI(TAG, "CPU0 reset reason: %s", GetResetReasonString(0).c_str());
 
   // Reset timestamp of last user action
   _lastUserAction = millis();
   
   // Log startup info
+  ESP_LOGI(TAG, "Finished initializing system helper");
 }
 
 //===============================================================

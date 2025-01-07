@@ -12,6 +12,11 @@
 #include "EncoderButtonDriver.h"
 
 //===============================================================
+// Constants
+//===============================================================
+static const char* TAG = "encoder";
+
+//===============================================================
 // Global variables
 //===============================================================
  EncoderButtonDriver EncoderButton;
@@ -28,6 +33,9 @@ EncoderButtonDriver::EncoderButtonDriver()
 //===============================================================
 void EncoderButtonDriver::Begin(uint8_t pinEncoderOutA, uint8_t pinEncoderOutB, uint8_t pinEncoderButton)
 {
+  // Log startup info
+  ESP_LOGI(TAG, "Begin initializing encoder and button driver");
+
   // Set pins
   _pinEncoderOutA = pinEncoderOutA;
   _pinEncoderOutB = pinEncoderOutB;
@@ -38,6 +46,8 @@ void EncoderButtonDriver::Begin(uint8_t pinEncoderOutA, uint8_t pinEncoderOutB, 
   pinMode(_pinEncoderOutB, INPUT_PULLUP);
   pinMode(_pinEncoderButton, INPUT_PULLUP);
   
+  // Log startup info
+  ESP_LOGI(TAG, "Finished initializing encoder and button driver");
 }
 
 //===============================================================

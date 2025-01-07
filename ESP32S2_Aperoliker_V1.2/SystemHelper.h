@@ -16,6 +16,7 @@
 #include <ESP.h>
 #include <WiFi.h>
 #include <SPIFFS.h>
+#include <esp_log.h>
 #include <esp32s2/rom/rtc.h>
 
 //===============================================================

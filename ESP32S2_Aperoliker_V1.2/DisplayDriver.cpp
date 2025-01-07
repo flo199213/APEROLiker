@@ -12,6 +12,11 @@
 #include "DisplayDriver.h"
 
 //===============================================================
+// Constants
+//===============================================================
+static const char* TAG = "display";
+
+//===============================================================
 // Global variables
 //===============================================================
  DisplayDriver Display;
@@ -28,6 +33,9 @@ DisplayDriver::DisplayDriver()
 //===============================================================
 void DisplayDriver::Begin(Adafruit_ST7789* tft, bool spiffsAvailable)
 {
+  // Log startup info
+  ESP_LOGI(TAG, "Begin initializing display driver");
+
   // Set display variable
   _tft = tft;
 
@@ -58,13 +66,19 @@ void DisplayDriver::Begin(Adafruit_ST7789* tft, bool spiffsAvailable)
     _imagesAvailable = (reader.LoadBMP(startupImageBottle.c_str(), _imageBottle) == IMAGE_SUCCESS &&
       reader.LoadBMP(startupImageGlass.c_str(), _imageGlass) == IMAGE_SUCCESS &&
       reader.LoadBMP(startupImageLogo.c_str(), _imageLogo) == IMAGE_SUCCESS) ? IMAGE_SUCCESS : IMAGE_ERR_FILE_NOT_FOUND;
+      
+    ESP_LOGI(TAG, "SPIFFS images are %s", (_imagesAvailable ? "available" : "not available"));
   }
   else
   {
     // Debug information on display
     DrawCenteredString("SPIFFS Failed", x, y + SHORTLINEOFFSET, false, 0);
+    ESP_LOGE(TAG, "Loading SPIFFS images failed");
     delay(3000);
   }
+  
+  // Log startup info
+  ESP_LOGI(TAG, "Finished initializing display driver");
 }
 
 //===============================================================
@@ -116,6 +130,9 @@ void DisplayDriver::SetPercentages(double liquid1_Percentage, double liquid2_Per
 //===============================================================
 void DisplayDriver::ShowIntroPage()
 {
+  // Set log
+  ESP_LOGI(TAG, "Show intro page");
+
   // Draw intro page background
   _tft->fillRect(0, 0,                TFT_WIDTH, TFT_HEIGHT * 0.8, TFT_COLOR_STARTPAGE_BACKGROUND);
   _tft->fillRect(0, TFT_HEIGHT * 0.8, TFT_WIDTH, TFT_HEIGHT * 0.2, TFT_COLOR_STARTPAGE_FOREGROUND);
@@ -144,6 +161,9 @@ void DisplayDriver::ShowIntroPage()
 //===============================================================
 void DisplayDriver::ShowHelpPage()
 {
+  // Set log
+  ESP_LOGI(TAG, "Show help page");
+
   int16_t x = 15;
   int16_t y = HEADEROFFSET_Y + 20;
 
@@ -188,7 +208,10 @@ void DisplayDriver::ShowHelpPage()
 //===============================================================
 void DisplayDriver::ShowMenuPage()
 {
-    // Clear screen
+  // Set log
+  ESP_LOGI(TAG, "Show menu page");
+
+  // Clear screen
   _tft->fillScreen(TFT_COLOR_BACKGROUND);
   
   // Draw header information
@@ -203,6 +226,9 @@ void DisplayDriver::ShowMenuPage()
 //===============================================================
 void DisplayDriver::ShowDashboardPage()
 {
+  // Set log
+  ESP_LOGI(TAG, "Show dashboard page");
+
   // Clear screen
   _tft->fillScreen(TFT_COLOR_BACKGROUND);
   
@@ -232,6 +258,9 @@ void DisplayDriver::ShowDashboardPage()
 //===============================================================
 void DisplayDriver::ShowCleaningPage()
 {
+  // Set log
+  ESP_LOGI(TAG, "Show cleaning page");
+
   // Clear screen
   _tft->fillScreen(TFT_COLOR_BACKGROUND);
   
@@ -247,6 +276,9 @@ void DisplayDriver::ShowCleaningPage()
 //===============================================================
 void DisplayDriver::ShowSettingsPage()
 {
+  // Set log
+  ESP_LOGI(TAG, "Show settings page");
+
   int16_t x = 15;
   int16_t y = HEADEROFFSET_Y + 25;
 
@@ -319,6 +351,9 @@ void DisplayDriver::ShowSettingsPage()
 //===============================================================
 void DisplayDriver::ShowScreenSaverPage()
 {
+  // Set log
+  ESP_LOGI(TAG, "Show screen saver page");
+
   // Clear screen
   _tft->fillScreen(TFT_COLOR_BACKGROUND);
 

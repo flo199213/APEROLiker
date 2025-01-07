@@ -12,6 +12,11 @@
 #include "FlowMeterDriver.h"
 
 //===============================================================
+// Constants
+//===============================================================
+static const char* TAG = "flowmeter";
+
+//===============================================================
 // Global variables
 //===============================================================
 FlowMeterDriver FlowMeter;
@@ -21,6 +26,21 @@ FlowMeterDriver FlowMeter;
 //===============================================================
 FlowMeterDriver::FlowMeterDriver()
 {
+}
+
+//===============================================================
+// Initializes the flow meter driver
+//===============================================================
+void FlowMeterDriver::Begin()
+{
+  // Log startup info
+  ESP_LOGI(TAG, "Begin initializing flow meter driver");
+
+  // Load settings from flash
+  Load();
+
+  // Log startup info
+  ESP_LOGI(TAG, "Finished initializing flow meter driver");
 }
 
 //===============================================================
@@ -34,6 +54,12 @@ void FlowMeterDriver::Load()
     _valueLiquid2_L = _preferences.getDouble(KEY_FLOW_LIQUID2, 0.0);
     _valueLiquid3_L = _preferences.getDouble(KEY_FLOW_LIQUID3, 0.0);
     _preferences.end();
+    
+    ESP_LOGI(TAG, "Preferences successfully loaded from '%s'", SETTINGS_NAME);
+  }
+  else
+  {
+    ESP_LOGE(TAG, "Could not open preferences '%s'", SETTINGS_NAME);
   }
 }
 
@@ -48,6 +74,12 @@ void FlowMeterDriver::Save()
     _preferences.putDouble(KEY_FLOW_LIQUID2, _valueLiquid2_L);
     _preferences.putDouble(KEY_FLOW_LIQUID3, _valueLiquid3_L); 
     _preferences.end();
+
+    ESP_LOGI(TAG, "Preferences successfully saved to '%s'", SETTINGS_NAME);
+  }
+  else
+  {
+    ESP_LOGE(TAG, "Could not open preferences '%s'", SETTINGS_NAME);
   }
 }
 
@@ -60,6 +92,7 @@ void FlowMeterDriver::SaveAsync()
   if (_isSavePending)
   {
     _isSavePending = false;
+    ESP_LOGI(TAG, "Save flow meter is pending");
     Save();
   }
 }

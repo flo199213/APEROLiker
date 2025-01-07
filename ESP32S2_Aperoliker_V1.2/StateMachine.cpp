@@ -12,6 +12,11 @@
 #include "StateMachine.h"
 
 //===============================================================
+// Constants
+//===============================================================
+static const char* TAG = "statemachine";
+
+//===============================================================
 // Global variables
 //===============================================================
 StateMachine Statemachine;
@@ -28,6 +33,9 @@ StateMachine::StateMachine()
 //===============================================================
 void StateMachine::Begin(uint8_t pinBuzzer)
 {
+  // Log startup info
+  ESP_LOGI(TAG, "Begin initializing state machine");
+
   // Save pin definitions
   _pinBuzzer = pinBuzzer;
 
@@ -36,6 +44,9 @@ void StateMachine::Begin(uint8_t pinBuzzer)
 
   // Update all values
   UpdateValues();
+  
+  // Log startup info
+  ESP_LOGI(TAG, "Finished initializing state machine");
 }
 
 #if defined(WIFI_MIXER)
@@ -251,7 +262,7 @@ void StateMachine::FctMenu(MixerEvent event)
         UpdateValues();
 
         // Show menu page
-        Serial.println("[MAIN] Enter Menu Mode");
+        ESP_LOGI(TAG, "Enter menu mode");
         Display.ShowMenuPage();
 
         // Debounce page change
@@ -348,7 +359,7 @@ void StateMachine::FctDashboard(MixerEvent event)
         UpdateValues();
 
         // Show dashboard page
-        Serial.println("[MAIN] Enter Dashboard Mode");
+        ESP_LOGI(TAG, "Enter dashboard mode");
         Display.ShowDashboardPage();
 
         // Debounce page change
@@ -465,7 +476,7 @@ void StateMachine::FctCleaning(MixerEvent event)
         UpdateValues();
 
         // Show cleaning page
-        Serial.println("[MAIN] Enter Cleaning Mode");
+        ESP_LOGI(TAG, "Enter cleaning mode");
         Display.ShowCleaningPage();
 
         // Debounce page change
@@ -553,7 +564,7 @@ void StateMachine::FctReset(MixerEvent event)
         UpdateValues();
         
         // Draw reset info box over current page
-        Serial.println("[MAIN] Enter Reset Mode");
+        ESP_LOGI(TAG, "Enter reset mode");
         Display.DrawInfoBox("Mixture", "reset!");
 
         // Save reset page start time
@@ -601,7 +612,7 @@ void StateMachine::FctSettings(MixerEvent event)
         UpdateValues();
 
         // Show settings page
-        Serial.println("[MAIN] Enter Settings Mode");
+        ESP_LOGI(TAG, "Enter settings mode");
         Display.ShowSettingsPage();
         
         // Debounce page change
@@ -706,8 +717,8 @@ void StateMachine::FctScreenSaver(MixerEvent event)
         // Update display and pump values
         UpdateValues();
         
-        // Show page
-        Serial.println("[MAIN] Enter Screen Saver Mode");
+        // Show screen saver page
+        ESP_LOGI(TAG, "Enter screen saver mode");
         Display.ShowScreenSaverPage();
         
         // Reset and ignore user input

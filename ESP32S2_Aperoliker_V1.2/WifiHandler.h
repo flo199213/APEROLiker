@@ -20,6 +20,7 @@
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <SPIFFSEditor.h>
+#include <esp_log.h>
 #include "Config.h"
 #include "SystemHelper.h"
 #include "StateMachine.h"

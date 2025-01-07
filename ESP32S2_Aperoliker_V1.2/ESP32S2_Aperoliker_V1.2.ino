@@ -42,6 +42,7 @@
 #include <SPIFFS.h>
 #include <WiFi.h>
 #include <Adafruit_ST7789.h>
+#include <esp_log.h>
 #include "Config.h"
 #include "SystemHelper.h"
 #include "StateMachine.h"
@@ -51,6 +52,10 @@
 #include "FlowMeterDriver.h"
 #include "WifiHandler.h"
 
+//===============================================================
+// Constants
+//===============================================================
+static const char* TAG = "main";
 
 //===============================================================
 // Defines
@@ -170,9 +175,10 @@ void setup(void)
 #if defined(DEBUG_MIXER)
   delay(2000);
 #endif
-  Serial.println("[SETUP] " + String(MIXER_NAME) + " " + String(APP_VERSION));
+  ESP_LOGI(TAG, "Setup %s %s", MIXER_NAME, APP_VERSION);
 
   // Initialize SPIFFS
+  ESP_LOGI(TAG, "Initialize SPIFFS");
   SPIFFS.end(); // Close first for begin with 'formatOnFail'
   bool spiffsAvailable = SPIFFS.begin(true);
 
@@ -180,18 +186,22 @@ void setup(void)
   Systemhelper.Begin();
 
   // Initialize SPI
+  ESP_LOGI(TAG, "Initialize SPI");
   SPIClass* spi = new SPIClass(HSPI);
   spi->begin(PIN_TFT_SCL, -1, PIN_TFT_SDA, PIN_TFT_CS);
 
   // Initialize display
+  ESP_LOGI(TAG, "Initialize display");
   tft = new Adafruit_ST7789(spi, PIN_TFT_CS, PIN_TFT_DC, PIN_TFT_RST);
   Display.Begin(tft, spiffsAvailable);
 
   // Show intro page
+  ESP_LOGI(TAG, "Show intro page");
   Display.ShowIntroPage();
   uint32_t startupTime_ms = millis();
 
   // Initialize GPIOs
+  ESP_LOGI(TAG, "Initialize GPIOs");
   pinMode(PIN_PUMPS_ENABLE, INPUT_PULLUP);
   pinMode(PIN_PUMPS_ENABLE_GND, OUTPUT);
   pinMode(PIN_LEDLIGHT, OUTPUT);
@@ -200,6 +210,7 @@ void setup(void)
   pinMode(PIN_VCC, INPUT);
 
   // Initialize outputs
+  ESP_LOGI(TAG, "Initialize outputs");
   digitalWrite(PIN_PUMPS_ENABLE_GND, LOW); // Fixed GND value (0V, LOW)
   digitalWrite(PIN_LEDLIGHT, LOW);
   digitalWrite(PIN_LEDSTATUS, LOW);
@@ -213,21 +224,26 @@ void setup(void)
   }
 
   // Initialize encoder button
+  ESP_LOGI(TAG, "Initialize encoder button");
   EncoderButton.Begin(PIN_ENCODER_OUTA, PIN_ENCODER_OUTB, PIN_ENCODER_BUTTON);
   attachInterrupt(digitalPinToInterrupt(PIN_ENCODER_OUTA), ISR_EncoderA, CHANGE);
   attachInterrupt(digitalPinToInterrupt(PIN_ENCODER_OUTB), ISR_EncoderB, CHANGE);
   attachInterrupt(digitalPinToInterrupt(PIN_ENCODER_BUTTON), ISR_EncoderButton, CHANGE);
 
   // Initialize flow values from EEPROM
+  ESP_LOGI(TAG, "Initialize flow values from EEPROM");
   FlowMeter.Load();
 
   // Get VCC voltage (Only for Custom PCB)
   double vccVoltage = analogReadMilliVolts(PIN_VCC) * VCC_CONVERSION_FACTOR;
+  ESP_LOGI(TAG, "Get VCC voltage: %0.2f", vccVoltage);
   
   // Initialize pump driver
+  ESP_LOGI(TAG, "Initialize pump driver");
   Pumps.Begin(PIN_PUMP_1, PIN_PUMP_2, PIN_PUMP_3, vccVoltage);
 
   // Initialize state machine
+  ESP_LOGI(TAG, "Initialize state machine");
   Statemachine.Begin(PIN_BUZZER);
   
   // Wait for the rest of the intro time
@@ -237,6 +253,7 @@ void setup(void)
   sei();
 
   // Show help page until button is pressed
+  ESP_LOGI(TAG, "Show help page");
   Display.ShowHelpPage();
   bool infoBoxShown = false;
   while (true)
@@ -265,20 +282,24 @@ void setup(void)
 
 #if defined(WIFI_MIXER)
   // Initialize wifi
+  ESP_LOGI(TAG, "Initialize wifi");
   Wifihandler.Begin();
 #endif
 
   // Initial run of state machine with entry event
+  ESP_LOGI(TAG, "Initial run of state machine");
   Statemachine.Execute(eEntry);
 
   // Initialize interrupt for dispenser lever
+  ESP_LOGI(TAG, "Initialize interrupt for dispenser lever");
   attachInterrupt(digitalPinToInterrupt(PIN_PUMPS_ENABLE), ISR_Pumps_Enable, CHANGE);
 
   // Start main task
+  ESP_LOGI(TAG, "Start main task");
   xTaskCreate(Main_Task, "Main_Task", 4096, NULL, 10, &mainTaskHandle);
 
   // Final output
-  Serial.println("[SETUP] Finished");
+  ESP_LOGI(TAG, "Setup Finished");
 }
 
 //===============================================================
@@ -290,12 +311,13 @@ void loop()
   if ((millis() - aliveTimestamp) > AliveTime_ms)
   {
     aliveTimestamp = millis();
-    Serial.println("[LOOP] Alive");
+    ESP_LOGI(TAG, "Loop Alive");
     
     // Print mixture information
-    Serial.println(Statemachine.GetMixtureString());
+    ESP_LOGI(TAG, "%s", Statemachine.GetMixtureString().c_str());
 
     // Print memory information
+    ESP_LOGI(TAG, "%s", Systemhelper.GetMemoryInfoString().c_str());
 
     // Toggle status LED
     digitalWrite(PIN_LEDSTATUS, !digitalRead(PIN_LEDSTATUS));

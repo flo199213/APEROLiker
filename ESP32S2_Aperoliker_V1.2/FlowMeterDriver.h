@@ -14,6 +14,7 @@
 //===============================================================
 #include <Arduino.h>
 #include <Preferences.h>
+#include <esp_log.h>
 #include "Config.h"
 
 //===============================================================
@@ -33,6 +34,9 @@ class FlowMeterDriver
   public:
     // Constructor
     FlowMeterDriver();
+    
+    // Initializes the flow meter driver
+    void Begin();
     
     // Load settings from flash
     void Load();

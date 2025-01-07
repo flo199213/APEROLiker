@@ -13,6 +13,7 @@
 // Includes
 //===============================================================
 #include <Arduino.h>
+#include <esp_log.h>
 #include "Config.h"
 #include "SystemHelper.h"
 

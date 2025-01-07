@@ -11,6 +11,11 @@
 //===============================================================
 #include "WifiHandler.h"
 
+//===============================================================
+// Constants
+//===============================================================
+static const char* TAG = "wifihandler";
+
 #if defined(WIFI_MIXER)
 
 //===============================================================
@@ -38,8 +43,14 @@ WifiHandler::WifiHandler()
 //===============================================================
 void WifiHandler::Begin()
 {
+  // Log startup info
+  ESP_LOGI(TAG, "Begin initializing wifi handler");
+
   Load();
   SetWifiMode(_initWifiMode);
+  
+  // Log startup info
+  ESP_LOGI(TAG, "Finished initializing wifi handler");
 }
 
 //===============================================================
@@ -51,6 +62,12 @@ void WifiHandler::Load()
   {
     _initWifiMode = _preferences.getBool(KEY_WIFIMODE, false) ? WIFI_MODE_AP : WIFI_MODE_NULL;
     _preferences.end();
+
+    ESP_LOGI(TAG, "Preferences successfully loaded from '%s'", SETTINGS_NAME);
+  }
+  else
+  {
+    ESP_LOGE(TAG, "Could not open preferences '%s'", SETTINGS_NAME);
   }
 }
 
@@ -63,6 +80,12 @@ void WifiHandler::Save()
   {
     _preferences.putBool(KEY_WIFIMODE, _wifiMode == WIFI_AP);
     _preferences.end();
+
+    ESP_LOGI(TAG, "Preferences successfully saved to '%s'", SETTINGS_NAME);
+  }
+  else
+  {
+    ESP_LOGE(TAG, "Could not open preferences '%s'", SETTINGS_NAME);
   }
 }
 
@@ -83,6 +106,9 @@ void WifiHandler::SetWifiMode(wifi_mode_t mode)
   {
     return;
   }
+  
+  // Set log
+  ESP_LOGI(TAG, "Set wifi mode to %s", mode == WIFI_MODE_AP ? "AP" : "OFF");
 
   if (mode == WIFI_MODE_AP)
   {
@@ -177,6 +203,7 @@ void WifiHandler::OnWebsocketEvent(AsyncWebSocket* server, AsyncWebSocketClient*
     client->printf("Connected Client Number %u", (uint16_t)client->id());
     UpdateSettingsToClient(client);
     client->ping();
+    ESP_LOGI(TAG, "Client connected");
   }
   //else if (type == WS_EVT_DISCONNECT)
   //else if (type == WS_EVT_ERROR)
@@ -263,26 +290,31 @@ void WifiHandler::OnWebsocketEvent(AsyncWebSocket* server, AsyncWebSocketClient*
 //===============================================================
 bool WifiHandler::StartWebServer()
 {
+  ESP_LOGI(TAG, "Start web server");
 
   IPAddress local_ip(192, 168, 1, 1);
   IPAddress gateway(192, 168, 1, 1);
   IPAddress subnet(255, 255, 255, 0);
 
   // Set wifi TX power
+  ESP_LOGI(TAG, "Set wifi TX power");
   WiFi.setTxPower(WIFI_POWER_19_5dBm);
 
   // Start access point
+  ESP_LOGI(TAG, "Start access point");
   WiFi.softAP(_ssid, _password);
   WiFi.softAPConfig(local_ip, gateway, subnet);
   delay(100);
 
   // Set up mDNS responder to mixer name, e.g. http://mixer.local
+  ESP_LOGI(TAG, "Set up mDNS responde");
   String mdnsName = MIXER_NAME;
   mdnsName.toLowerCase();
   mdnsName.trim();
   MDNS.begin(mdnsName);
 
   // Create web server
+  ESP_LOGI(TAG, "Create web server");
   _webserver.reset(new AsyncWebServer(80));
   if (!_webserver)
   {
@@ -290,6 +322,7 @@ bool WifiHandler::StartWebServer()
   }
 
   // Create web socket
+  ESP_LOGI(TAG, "Create web socket");
   _websocket.reset(new AsyncWebSocket("/websocket"));
   if (!_websocket)
   {
@@ -297,6 +330,7 @@ bool WifiHandler::StartWebServer()
   }
 
   // Create web events
+  ESP_LOGI(TAG, "Create web events");
   _webevents.reset(new AsyncEventSource("/events"));
   if (!_webevents)
   {
@@ -304,21 +338,25 @@ bool WifiHandler::StartWebServer()
   }
   
   // Add root URL handler to web server
+  ESP_LOGI(TAG, "Add root URL handler");
   _webserver->on("/", HTTP_GET, [](AsyncWebServerRequest * request)
   {
     request->send(SPIFFS, "/index.html", "text/html");
   });
 
   // Add system info URL handler to web server
+  ESP_LOGI(TAG, "Add system info URL handler");
   _webserver->on("/systeminfo", HTTP_GET, [](AsyncWebServerRequest * request)
   {
     request->send(200, "text/plain", Systemhelper.GetSystemInfoString());
   });
 
-  // Add SPIFFS Handler to web server
+  // Add SPIFFS handler to web server
+  ESP_LOGI(TAG, "Add SPIFFS handler");
   _webserver->addHandler(new SPIFFSEditor());
 
   // Add not found handler to web server
+  ESP_LOGI(TAG, "Add not found handler");
   _webserver->onNotFound([](AsyncWebServerRequest *request)
   {
     String mixerName = MIXER_NAME;
@@ -328,19 +366,24 @@ bool WifiHandler::StartWebServer()
   });
 
   // Add websocket handler to web server
+  ESP_LOGI(TAG, "Add websocket handler");
   _websocket->onEvent(onWsEvent);
   _webserver->addHandler(_websocket.get());
 
   // Add event handler to web server
+  ESP_LOGI(TAG, "Add event handler");
   _webserver->addHandler(_webevents.get());
 
   // Add static files handler to web server
+  ESP_LOGI(TAG, "Add static files handler");
   _webserver->serveStatic("/", SPIFFS, "/").setDefaultFile("index.html");
   
   // Start web server
+  ESP_LOGI(TAG, "Start web server");
   _webserver->begin();
 
   // Add service to MDNS
+  ESP_LOGI(TAG, "Add service to MDNS");
   MDNS.addService("http", "tcp", 80);
 
   return true;
@@ -351,7 +394,10 @@ bool WifiHandler::StartWebServer()
 //===============================================================
 void WifiHandler::StopWebServer()
 {
+  ESP_LOGI(TAG, "Stop web server");
+
   // End old web event instances
+  ESP_LOGI(TAG, "End old web event instances");
   if (_webevents)
   {
     _webevents->close();
@@ -359,6 +405,7 @@ void WifiHandler::StopWebServer()
   }
 
   // End old web socket instances
+  ESP_LOGI(TAG, "End old web socket instances");
   if (_websocket)
   {
     _websocket->closeAll();
@@ -366,6 +413,7 @@ void WifiHandler::StopWebServer()
   }
 
   // End old web server instances
+  ESP_LOGI(TAG, "End old web server instances");
   if (_webserver)
   {
     _webserver->end();
@@ -373,6 +421,7 @@ void WifiHandler::StopWebServer()
   }
 
   // Deactivate Accesspoint and Wifi
+  ESP_LOGI(TAG, "Deactivate Accesspoint and Wifi");
   WiFi.softAPdisconnect(true);
 }
 

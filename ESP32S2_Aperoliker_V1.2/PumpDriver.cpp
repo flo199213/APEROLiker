@@ -12,6 +12,11 @@
 #include "PumpDriver.h"
 
 //===============================================================
+// Constants
+//===============================================================
+static const char* TAG = "pumps";
+
+//===============================================================
 // Global variables
 //===============================================================
 PumpDriver Pumps;
@@ -28,6 +33,9 @@ PumpDriver::PumpDriver()
 //===============================================================
 void PumpDriver::Begin(uint8_t pinPump1, uint8_t pinPump2, uint8_t pinPump3, double vccVoltage)
 {
+  // Log startup info
+  ESP_LOGI(TAG, "Begin initializing pump driver");
+
   // Set pins
   _pinPump1 = pinPump1;
   _pinPump2 = pinPump2;
@@ -41,6 +49,9 @@ void PumpDriver::Begin(uint8_t pinPump1, uint8_t pinPump2, uint8_t pinPump3, dou
 
   // Disable pump output
   DisableInternal();
+  
+  // Log startup info
+  ESP_LOGI(TAG, "Finished initializing pump driver");
 }
 
 //===============================================================
@@ -53,6 +64,12 @@ void PumpDriver::Load()
     _preferences.begin(SETTINGS_NAME, false);
     _cycleTimespan_ms = _preferences.getLong(KEY_CYCLETIMESPAN_MS, DEFAULT_CYCLE_TIMESPAN_MS);
     _preferences.end();
+
+    ESP_LOGI(TAG, "Preferences successfully loaded from '%s'", SETTINGS_NAME);
+  }
+  else
+  {
+    ESP_LOGE(TAG, "Could not open preferences '%s'", SETTINGS_NAME);
   }
 }
 
@@ -66,6 +83,12 @@ void PumpDriver::Save()
     _preferences.begin(SETTINGS_NAME, false);
     _preferences.putLong(KEY_CYCLETIMESPAN_MS, _cycleTimespan_ms);
     _preferences.end();
+
+    ESP_LOGI(TAG, "Preferences successfully saved to '%s'", SETTINGS_NAME);
+  }
+  else
+  {
+    ESP_LOGE(TAG, "Could not open preferences '%s'", SETTINGS_NAME);
   }
 }
 
@@ -86,6 +109,8 @@ void PumpDriver::Enable()
   // -> Update function is unlocked
   _isPumpEnabled = true;
 
+  // Set log info
+  ESP_LOGI(TAG, "Pumps enabled");
 }
 
 //===============================================================
@@ -105,6 +130,8 @@ void PumpDriver::Disable()
   // Disable internal gpios
   DisableInternal();
   
+  // Set log info
+  ESP_LOGI(TAG, "Pumps disabled");
 }
 
 //===============================================================
@@ -174,6 +201,8 @@ void PumpDriver::SetPumps(double value1_Percentage, double value2_Percentage, do
   _pwmPump1_ms = (uint32_t)(pump1Clip_Percentage / maxValue_Percentage * _cycleTimespan_ms);
   _pwmPump2_ms = (uint32_t)(pump2Clip_Percentage / maxValue_Percentage * _cycleTimespan_ms);
   _pwmPump3_ms = (uint32_t)(pump3Clip_Percentage / maxValue_Percentage * _cycleTimespan_ms);
+
+  ESP_LOGI(TAG, "Pump values changed to %d|%d|%d ms", _pwmPump1_ms, _pwmPump2_ms, _pwmPump3_ms);
 }
 
 //===============================================================
@@ -190,6 +219,7 @@ bool PumpDriver::SetCycleTimespan(uint32_t value_ms)
 
   // Set new value
   _cycleTimespan_ms = value_ms;
+  ESP_LOGI(TAG, "Cycle timespan changed to %d ms", _cycleTimespan_ms);
   
   return true;
 }

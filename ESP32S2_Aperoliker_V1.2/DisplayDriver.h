@@ -19,6 +19,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_ST7789.h>
 #include <Fonts/FreeSans9pt7b.h>
+#include <esp_log.h>
 #include "Config.h"
 #include "StateMachine.h"
 #include "SPIFFSImageReader.h"
