@@ -126,9 +126,9 @@ double FlowMeterDriver::GetValueLiquid3()
 //===============================================================
 void FlowMeterDriver::AddFlowTime(uint32_t valueLiquid1_ms, uint32_t valueLiquid2_ms, uint32_t valueLiquid3_ms)
 {
-  _valueLiquid1_L += (double)valueLiquid1_ms * FLOWRATE;
-  _valueLiquid2_L += (double)valueLiquid2_ms * FLOWRATE;
-  _valueLiquid3_L += (double)valueLiquid3_ms * FLOWRATE;
+  _valueLiquid1_L += (double)valueLiquid1_ms * FLOWRATE1;
+  _valueLiquid2_L += (double)valueLiquid2_ms * FLOWRATE2;
+  _valueLiquid3_L += (double)valueLiquid3_ms * FLOWRATE3;
 }
 
 //===============================================================

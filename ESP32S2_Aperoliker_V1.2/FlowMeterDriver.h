@@ -20,7 +20,9 @@
 //===============================================================
 // Defines
 //===============================================================
-#define FLOWRATE              0.00000416667   // 250 ml/min (pump specification @ 20V) => 5e-6 l/ms
+#define FLOWRATE1             0.00000416667   // 250 ml/min (pump 1 specification @ 24V) => 5e-6 l/ms
+#define FLOWRATE2             0.00000416667   // 250 ml/min (pump 2 specification @ 24V) => 5e-6 l/ms
+#define FLOWRATE3             0.00000416667   // 250 ml/min (pump 3 specification @ 24V) => 5e-6 l/ms
 
 #define KEY_FLOW_LIQUID1      "FlowLiquid1"   // Key name: Maximum string length is 15 bytes, excluding a zero terminator.
 #define KEY_FLOW_LIQUID2      "FlowLiquid2"   // Key name: Maximum string length is 15 bytes, excluding a zero terminator.
