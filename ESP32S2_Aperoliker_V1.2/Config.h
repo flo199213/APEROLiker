@@ -29,12 +29,10 @@
 
 // This means that the ESP will wait 2 seconds each time it is started
 // because the start of the serial debug output on ESP32S2 takes this time
-// Uncomment for debug build
-//#define DEBUG_MIXER
+//#define DEBUG_MIXER     // Uncomment for debug build
 
 // Using the mixer without wifi makes the firmware more stable
-// Uncomment for wifi usage
-//#define WIFI_MIXER
+//#define WIFI_MIXER      // Uncomment for wifi usage
 
 // Set the value to 1 or -1 if your encoder is turning in the wrong direction
 #define ENCODER_DIRECTION                 -1
