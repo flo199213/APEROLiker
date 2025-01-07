@@ -75,6 +75,7 @@ class WifiHandler
     Preferences _preferences;
     
     // Wifi settings
+    bool _serverInitDone = false;
     wifi_mode_t _initWifiMode = WIFI_MODE_NULL;
     wifi_mode_t _wifiMode = WIFI_MODE_NULL;
 
@@ -83,18 +84,15 @@ class WifiHandler
     const char* _password = MIXER_PASSWORD;
 
     // Web server variables
-    std::unique_ptr<AsyncWebServer> _webserver;
-    std::unique_ptr<AsyncWebSocket> _websocket;
-    std::unique_ptr<AsyncEventSource> _webevents;
+    AsyncWebServer* _webserver;
+    AsyncWebSocket* _websocket;
+    AsyncEventSource* _webevents;
 
     // Alive counter variable
     uint32_t _lastAlive_ms = 0;
 
     // Starts the web server
     bool StartWebServer();
-
-    // Stops the web server
-    void StopWebServer();
 
     // Updates all settings in given client
     void UpdateSettingsToClient(AsyncWebSocketClient* client);

@@ -46,7 +46,10 @@ void WifiHandler::Begin()
   // Log startup info
   ESP_LOGI(TAG, "Begin initializing wifi handler");
 
+  // Load wifi settings
   Load();
+
+  // Set initial wifi mode
   SetWifiMode(_initWifiMode);
   
   // Log startup info
@@ -112,16 +115,39 @@ void WifiHandler::SetWifiMode(wifi_mode_t mode)
 
   if (mode == WIFI_MODE_AP)
   {
-    // Reset old webserver instances
-    StopWebServer();
+    IPAddress local_ip(192, 168, 1, 1);
+    IPAddress gateway(192, 168, 1, 1);
+    IPAddress subnet(255, 255, 255, 0);
 
-    // Set internal wifi mode if success
-    _wifiMode = StartWebServer() ? WIFI_MODE_AP : WIFI_MODE_NULL;
+    // Set wifi TX power
+    ESP_LOGI(TAG, "Set wifi TX power");
+    WiFi.setTxPower(WIFI_POWER_19_5dBm);
+
+    // Start access point
+    ESP_LOGI(TAG, "Start access point");
+    WiFi.softAP(_ssid, _password);
+    WiFi.softAPConfig(local_ip, gateway, subnet);
+    delay(100);
+
+    // Check for first call
+    if (!_serverInitDone)
+    {
+      // Start web server
+      _serverInitDone = StartWebServer();
+
+      // Set internal wifi mode if success
+      _wifiMode = _serverInitDone ? WIFI_MODE_AP : WIFI_MODE_NULL;
+    }
+    else
+    {
+      _wifiMode = WIFI_MODE_AP;
+    }
   }
   else
   {
-    // Just stop server
-    StopWebServer();
+    // Deactivate Accesspoint and Wifi
+    ESP_LOGI(TAG, "Deactivate Accesspoint and Wifi");
+    WiFi.softAPdisconnect(true);
     
     // Set internal wifi mode
     _wifiMode = WIFI_MODE_NULL;
@@ -141,7 +167,7 @@ uint16_t WifiHandler::GetConnectedClients()
 //===============================================================
 void WifiHandler::UpdateCycleTimespanToClients(uint32_t clientID)
 {
-  if (!_webevents)
+  if (_webevents == NULL)
   {
     return;
   }
@@ -292,20 +318,6 @@ bool WifiHandler::StartWebServer()
 {
   ESP_LOGI(TAG, "Start web server");
 
-  IPAddress local_ip(192, 168, 1, 1);
-  IPAddress gateway(192, 168, 1, 1);
-  IPAddress subnet(255, 255, 255, 0);
-
-  // Set wifi TX power
-  ESP_LOGI(TAG, "Set wifi TX power");
-  WiFi.setTxPower(WIFI_POWER_19_5dBm);
-
-  // Start access point
-  ESP_LOGI(TAG, "Start access point");
-  WiFi.softAP(_ssid, _password);
-  WiFi.softAPConfig(local_ip, gateway, subnet);
-  delay(100);
-
   // Set up mDNS responder to mixer name, e.g. http://mixer.local
   ESP_LOGI(TAG, "Set up mDNS responde");
   String mdnsName = MIXER_NAME;
@@ -315,7 +327,7 @@ bool WifiHandler::StartWebServer()
 
   // Create web server
   ESP_LOGI(TAG, "Create web server");
-  _webserver.reset(new AsyncWebServer(80));
+  _webserver = new AsyncWebServer(80);
   if (!_webserver)
   {
     return false;
@@ -323,7 +335,7 @@ bool WifiHandler::StartWebServer()
 
   // Create web socket
   ESP_LOGI(TAG, "Create web socket");
-  _websocket.reset(new AsyncWebSocket("/websocket"));
+  _websocket = new AsyncWebSocket("/websocket");
   if (!_websocket)
   {
     return false;
@@ -331,7 +343,7 @@ bool WifiHandler::StartWebServer()
 
   // Create web events
   ESP_LOGI(TAG, "Create web events");
-  _webevents.reset(new AsyncEventSource("/events"));
+  _webevents = new AsyncEventSource("/events");
   if (!_webevents)
   {
     return false;
@@ -368,11 +380,11 @@ bool WifiHandler::StartWebServer()
   // Add websocket handler to web server
   ESP_LOGI(TAG, "Add websocket handler");
   _websocket->onEvent(onWsEvent);
-  _webserver->addHandler(_websocket.get());
+  _webserver->addHandler(_websocket);
 
   // Add event handler to web server
   ESP_LOGI(TAG, "Add event handler");
-  _webserver->addHandler(_webevents.get());
+  _webserver->addHandler(_webevents);
 
   // Add static files handler to web server
   ESP_LOGI(TAG, "Add static files handler");
@@ -387,42 +399,6 @@ bool WifiHandler::StartWebServer()
   MDNS.addService("http", "tcp", 80);
 
   return true;
-}
-
-//===============================================================
-// Stops the web server
-//===============================================================
-void WifiHandler::StopWebServer()
-{
-  ESP_LOGI(TAG, "Stop web server");
-
-  // End old web event instances
-  ESP_LOGI(TAG, "End old web event instances");
-  if (_webevents)
-  {
-    _webevents->close();
-    _webevents.reset();
-  }
-
-  // End old web socket instances
-  ESP_LOGI(TAG, "End old web socket instances");
-  if (_websocket)
-  {
-    _websocket->closeAll();
-    _websocket.reset();
-  }
-
-  // End old web server instances
-  ESP_LOGI(TAG, "End old web server instances");
-  if (_webserver)
-  {
-    _webserver->end();
-    _webserver.reset();
-  }
-
-  // Deactivate Accesspoint and Wifi
-  ESP_LOGI(TAG, "Deactivate Accesspoint and Wifi");
-  WiFi.softAPdisconnect(true);
 }
 
 //===============================================================
