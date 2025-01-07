@@ -370,7 +370,7 @@ void SPIFFSEditor::handleRequest(AsyncWebServerRequest* request)
     }
     else if (request->hasParam("systeminfo"))
     {
-      request->send(200, "", GetSystemInfoString());
+      request->send(200, "", Systemhelper.GetSystemInfoString());
     }
     else if (request->hasParam("list"))
     {

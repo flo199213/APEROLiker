@@ -36,9 +36,6 @@ class PumpDriver
 
     // Initializes the pump driver
     void Begin(uint8_t pinPump1, uint8_t pinPump2, uint8_t pinPump3, double vccVoltage);
-
-    // Return the timestamp of the last user action
-    uint32_t GetLastUserAction();
     
     // Load settings from flash
     void Load();
@@ -92,8 +89,8 @@ class PumpDriver
     bool _lastEnablePump3 = false;
     uint32_t _lastPumpCycleStart_ms = 0;
     
-    // Timestamp of last user action
-    uint32_t _lastUserAction = 0;
+    // Enables pump output (internal)
+    void EnableInternal();
 
     // Disables pump output (internal)
     void DisableInternal();

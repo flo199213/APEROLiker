@@ -86,11 +86,15 @@ void WifiHandler::SetWifiMode(wifi_mode_t mode)
 
   if (mode == WIFI_MODE_AP)
   {
+    // Reset old webserver instances
+    StopWebServer();
+
     // Set internal wifi mode if success
     _wifiMode = StartWebServer() ? WIFI_MODE_AP : WIFI_MODE_NULL;
   }
   else
   {
+    // Just stop server
     StopWebServer();
     
     // Set internal wifi mode
@@ -193,6 +197,9 @@ void WifiHandler::OnWebsocketEvent(AsyncWebSocket* server, AsyncWebSocketClient*
           msg += (char)data[index];
         }
 
+        // Update last user interaction
+        Systemhelper.SetLastUserAction();
+
         if (msg.startsWith("FULLUPDATE"))
         {
           // Send all static settings to mixer on websocket connect
@@ -256,8 +263,6 @@ void WifiHandler::OnWebsocketEvent(AsyncWebSocket* server, AsyncWebSocketClient*
 //===============================================================
 bool WifiHandler::StartWebServer()
 {
-  // Reset old webserver instances
-  StopWebServer();
 
   IPAddress local_ip(192, 168, 1, 1);
   IPAddress gateway(192, 168, 1, 1);
@@ -307,7 +312,7 @@ bool WifiHandler::StartWebServer()
   // Add system info URL handler to web server
   _webserver->on("/systeminfo", HTTP_GET, [](AsyncWebServerRequest * request)
   {
-    request->send(200, "text/plain", GetSystemInfoString());
+    request->send(200, "text/plain", Systemhelper.GetSystemInfoString());
   });
 
   // Add SPIFFS Handler to web server

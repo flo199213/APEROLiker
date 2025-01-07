@@ -121,11 +121,15 @@ void IRAM_ATTR ISR_Pumps_Enable()
     // Request save flow values to flash
     FlowMeter.RequestSaveAsync();
   }
-  else
+  else if (Statemachine.GetCurrentState() == eDashboard ||
+    Statemachine.GetCurrentState() == eCleaning)
   {
     // Enable pump power
      Pumps.Enable();
   }
+
+  // Update last user interaction
+  Systemhelper.SetLastUserAction();
 }
 
 //===============================================================
@@ -167,20 +171,13 @@ void setup(void)
   delay(2000);
 #endif
   Serial.println("[SETUP] " + String(MIXER_NAME) + " " + String(APP_VERSION));
-  Serial.println(GetSystemInfoString());
-  Serial.println();
-
-  // Print restart reason
-  Serial.print("CPU0 reset reason: ");
-  Serial.println(GetResetReasonString(0));
-  Serial.println();
 
   // Initialize SPIFFS
   SPIFFS.end(); // Close first for begin with 'formatOnFail'
   bool spiffsAvailable = SPIFFS.begin(true);
-  size_t spiffsTotal = SPIFFS.totalBytes();
-  size_t spiffsUsed = SPIFFS.usedBytes();
-  Serial.println(String("[SETUP] SPIFFS: ") + String(spiffsUsed) + "/" + String(spiffsTotal) + " Bytes used (SPIFFS Available: " + (spiffsAvailable ? "true" : "false") + ")");
+
+  // Initialize system helper
+  Systemhelper.Begin();
 
   // Initialize SPI
   SPIClass* spi = new SPIClass(HSPI);
@@ -299,16 +296,13 @@ void loop()
     Serial.println(Statemachine.GetMixtureString());
 
     // Print memory information
-    Serial.println(GetMemoryInfoString());
 
     // Toggle status LED
     digitalWrite(PIN_LEDSTATUS, !digitalRead(PIN_LEDSTATUS));
   }
 
   // Flash LED light if dispensing is in progress
-  if (Pumps.IsEnabled() &&
-    (Statemachine.GetCurrentState() == eDashboard ||
-    Statemachine.GetCurrentState() == eCleaning))
+  if (Pumps.IsEnabled())
   {
     // Set LED to blink
     if ((millis() - blinkTimestamp) > BlinkTime_ms)

@@ -11,11 +11,32 @@
 //===============================================================
 #include "SystemHelper.h"
 
+//===============================================================
+// Global variables
+//===============================================================
+SystemHelper Systemhelper;
+
+//===============================================================
+// Initializes the system helper
+//===============================================================
+void SystemHelper::Begin()
+{
+  // Log startup info
+
+  // Show system information
+
+  // Print restart reason
+
+  // Reset timestamp of last user action
+  _lastUserAction = millis();
+  
+  // Log startup info
+}
 
 //===============================================================
 // Returns the complete system info as string
 //===============================================================
-String GetSystemInfoString()
+String SystemHelper::GetSystemInfoString()
 {
   String returnString;
   
@@ -59,16 +80,15 @@ String GetSystemInfoString()
 //===============================================================
 // Returns memory info string
 //===============================================================
-String GetMemoryInfoString(bool allOrDynamic)
+String SystemHelper::GetMemoryInfoString(bool all)
 {
   String returnString;
 
-  bool spiffsAvailable = SPIFFS.begin(false);
   double spiffsTotal = max(1.0, (double)SPIFFS.totalBytes());
   double spiffsUsed = (double)SPIFFS.usedBytes();
   double spiffsUsage = spiffsUsed / spiffsTotal * 100.0;
 
-  if (allOrDynamic)
+  if (all)
   {
     returnString += "Flash-Size:      " + String((double)ESP.getFlashChipSize() / (1024.0 * 1024.0), 6) + " MB\n";
     returnString += "SRAM-Size:       " + String((double)ESP.getFreeHeap() / (1024.0 * 1024.0), 6) + " MB\n";
@@ -77,11 +97,16 @@ String GetMemoryInfoString(bool allOrDynamic)
     returnString += "Sketch-Size:     " + String((double)ESP.getSketchSize() / (1024.0 * 1024.0), 6) + " MB\n";
     returnString += "FreeSketch-Size: " + String((double)ESP.getFreeSketchSpace() / (1024.0 * 1024.0), 6) + " MB\n";
     returnString += "\n";
-    returnString += "SPIFFS Ready:    " + String(spiffsAvailable ? "true\n" : "false\n");
+    returnString += "SPIFFS Ready:    " + String(SPIFFS.begin(false) ? "true\n" : "false\n");
     returnString += "SPIFFS-Total:    " + String(spiffsTotal / (1024.0 * 1024.0), 6) + " MB\n";
+    returnString += "SPIFFS-Used:     " + String(spiffsUsed / (1024.0 * 1024.0), 6) + " MB (" + spiffsUsage + "%)\n";
+    returnString += "Free-Heap:       " + String((double)ESP.getFreeHeap() / (1024.0 * 1024.0), 6) + " MB\n";
   }
-  returnString += "SPIFFS-Used:     " + String(spiffsUsed / (1024.0 * 1024.0), 6) + " MB (" + spiffsUsage + "%)\n";
-  returnString += "Free-Heap:       " + String((double)ESP.getFreeHeap() / (1024.0 * 1024.0), 6) + " MB\n";
+  else
+  {
+    returnString += "SPIFFS-Used: " + String(spiffsUsed / (1024.0 * 1024.0), 6) + " MB (" + spiffsUsage + "%), ";
+    returnString += "Free-Heap: " + String((double)ESP.getFreeHeap() / (1024.0 * 1024.0), 6) + " MB\n";
+  }
 
   return returnString;
 }
@@ -89,7 +114,7 @@ String GetMemoryInfoString(bool allOrDynamic)
 //===============================================================
 // Returns a string for a wifi power
 //===============================================================
-String WifiPowerToString(wifi_power_t power)
+String SystemHelper::WifiPowerToString(wifi_power_t power)
 {
   switch (power)
   {
@@ -125,7 +150,7 @@ String WifiPowerToString(wifi_power_t power)
 //===============================================================
 // Returns the reset reason as string
 //===============================================================
-String GetResetReasonString(int cpu)
+String SystemHelper::GetResetReasonString(int cpu)
 {
   int reason = rtc_get_reset_reason(cpu);
   
@@ -164,4 +189,20 @@ String GetResetReasonString(int cpu)
     default:
       return "NO_MEAN";
   }
+}
+
+//===============================================================
+// Sets the timestamp of the last user action to the current time
+//===============================================================
+void SystemHelper::SetLastUserAction()
+{
+  _lastUserAction = millis();
+}
+
+//===============================================================
+// Return the timestamp of the last user action
+//===============================================================
+uint32_t SystemHelper::GetLastUserAction()
+{
+  return _lastUserAction;
 }

@@ -318,8 +318,7 @@ void StateMachine::FctMenu(MixerEvent event)
         }
 
         // Check for screen saver timeout
-        if (millis() - EncoderButton.GetLastUserAction() > SCREENSAVER_TIMEOUT_MS &&
-          millis() - Pumps.GetLastUserAction() > SCREENSAVER_TIMEOUT_MS)
+        if (millis() - Systemhelper.GetLastUserAction() > SCREENSAVER_TIMEOUT_MS)
         {
           // Exit menu mode and enter screen saver mode
           Execute(eExit);
@@ -436,8 +435,7 @@ void StateMachine::FctDashboard(MixerEvent event)
         }
 
         // Check for screen saver timeout
-        if (millis() - EncoderButton.GetLastUserAction() > SCREENSAVER_TIMEOUT_MS &&
-          millis() - Pumps.GetLastUserAction() > SCREENSAVER_TIMEOUT_MS)
+        if (millis() - Systemhelper.GetLastUserAction() > SCREENSAVER_TIMEOUT_MS)
         {
           // Exit dashboard mode and enter screen saver mode
           Execute(eExit);
@@ -522,8 +520,7 @@ void StateMachine::FctCleaning(MixerEvent event)
         }
         
         // Check for screen saver timeout
-        if (millis() - EncoderButton.GetLastUserAction() > SCREENSAVER_TIMEOUT_MS &&
-          millis() - Pumps.GetLastUserAction() > SCREENSAVER_TIMEOUT_MS)
+        if (millis() - Systemhelper.GetLastUserAction() > SCREENSAVER_TIMEOUT_MS)
         {
           // Exit cleaning mode and enter screen saver mode
           Execute(eExit);
@@ -673,8 +670,7 @@ void StateMachine::FctSettings(MixerEvent event)
         }
 
         // Check for screen saver timeout
-        if (millis() - EncoderButton.GetLastUserAction() > SCREENSAVER_TIMEOUT_MS &&
-          millis() - Pumps.GetLastUserAction() > SCREENSAVER_TIMEOUT_MS)
+        if (millis() - Systemhelper.GetLastUserAction() > SCREENSAVER_TIMEOUT_MS)
         {
           // Exit settings mode and enter screen saver mode
           Execute(eExit);
@@ -724,12 +720,14 @@ void StateMachine::FctScreenSaver(MixerEvent event)
       {
         // Draw screen saver
         Display.DrawScreenSaver();
+
+        // Check user input (Last user interaction will be set)
+        EncoderButton.GetEncoderIncrements();
+        EncoderButton.IsLongButtonPress(); 
+        EncoderButton.IsButtonPress();
         
-        // Check for user input
-        if (EncoderButton.GetEncoderIncrements() != 0 ||
-          EncoderButton.IsLongButtonPress() ||
-          EncoderButton.IsButtonPress() ||
-          Pumps.IsEnabled())
+        // Check for last user interaction
+        if (millis() - Systemhelper.GetLastUserAction() <= SCREENSAVER_TIMEOUT_MS)
         {
           // Exit screen saver mode and return to last mode
           Execute(eExit);

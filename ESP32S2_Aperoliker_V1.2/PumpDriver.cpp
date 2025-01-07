@@ -41,17 +41,6 @@ void PumpDriver::Begin(uint8_t pinPump1, uint8_t pinPump2, uint8_t pinPump3, dou
 
   // Disable pump output
   DisableInternal();
-
-  // Reset timestamp of last user action
-  _lastUserAction = millis();
-}
-
-//===============================================================
-// Return the timestamp of the last user action
-//===============================================================
-uint32_t PumpDriver::GetLastUserAction()
-{
-  return _lastUserAction;
 }
 
 //===============================================================
@@ -90,17 +79,13 @@ void PumpDriver::Enable()
     return;
   }
 
-  // Set pins to output direction (enable)
-  pinMode(_pinPump1, OUTPUT);
-  pinMode(_pinPump2, OUTPUT);
-  pinMode(_pinPump3, OUTPUT);
+  // Enable internal gpios
+  EnableInternal();
  
   // Set enabled flag to true
   // -> Update function is unlocked
   _isPumpEnabled = true;
 
-  // Set timestamp of last user action
-  _lastUserAction = millis();
 }
 
 //===============================================================
@@ -117,10 +102,20 @@ void PumpDriver::Disable()
   // -> Update function is locked
   _isPumpEnabled = false;
 
+  // Disable internal gpios
   DisableInternal();
   
-  // Set timestamp of last user action
-  _lastUserAction = millis();
+}
+
+//===============================================================
+// Enables pump output (internal)
+//===============================================================
+void PumpDriver::EnableInternal()
+{
+  // Set pins to output direction (enable)
+  pinMode(_pinPump1, OUTPUT);
+  pinMode(_pinPump2, OUTPUT);
+  pinMode(_pinPump3, OUTPUT);
 }
 
 //===============================================================
@@ -196,9 +191,6 @@ bool PumpDriver::SetCycleTimespan(uint32_t value_ms)
   // Set new value
   _cycleTimespan_ms = value_ms;
   
-  // Set timestamp of last user action
-  _lastUserAction = millis();
-
   return true;
 }
 

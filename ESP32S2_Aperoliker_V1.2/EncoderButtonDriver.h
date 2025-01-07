@@ -14,7 +14,7 @@
 //===============================================================
 #include <Arduino.h>
 #include "Config.h"
-
+#include "SystemHelper.h"
 
 //===============================================================
 // Defines
@@ -33,9 +33,6 @@ class EncoderButtonDriver
     // Initializes the encoder and button driver
     void Begin(uint8_t pinEncoderOutA, uint8_t pinEncoderOutB, uint8_t pinEncoderButton);
     
-    // Return the timestamp of the last user action
-    uint32_t GetLastUserAction();
-
     // Return true, if a button press is pending. Otherwise false
     bool IsButtonPress();
     
@@ -71,9 +68,6 @@ class EncoderButtonDriver
     bool _isButtonPress = false;
     uint32_t _lastButtonPress_ms = 0;
     bool _suppressShortButtonPress = false;
-
-    // Timestamp of last user action
-    uint32_t _lastUserAction = 0;
 };
 
 //===============================================================

@@ -54,7 +54,7 @@ class StateMachine
     int16_t GetAngle(MixtureLiquid liquid);
 
     // Returns the current mixer state of the state machine
-    MixerState GetCurrentState();
+    MixerState IRAM_ATTR GetCurrentState();
 
     // General state machine execution function
     void Execute(MixerEvent event);
