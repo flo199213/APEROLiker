@@ -16,8 +16,7 @@
 #include <ESP.h>
 #include <WiFi.h>
 #include <SPIFFS.h>
-#include "esp32s2/rom/rtc.h"
-
+#include <esp32s2/rom/rtc.h>
 
 //===============================================================
 // Returns the complete system info as string

@@ -17,7 +17,6 @@
 #include <Adafruit_SPITFT.h>
 #include "Config.h"
 
-
 //===============================================================
 // Enums
 //===============================================================
@@ -28,7 +27,6 @@ enum ImageReturnCode
   IMAGE_ERR_FORMAT,         // Not a supported image format
   IMAGE_ERR_MALLOC          // Could not allocate image
 };
-
 
 //===============================================================
 // SPIFFS image class
@@ -67,7 +65,6 @@ class SPIFFSImage
     // Loading occurs here
     friend class SPIFFSImageReader;
 };
-
 
 //===============================================================
 // SPIFFS image reader class

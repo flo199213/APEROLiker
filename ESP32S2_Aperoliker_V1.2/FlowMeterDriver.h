@@ -16,7 +16,6 @@
 #include <Preferences.h>
 #include "Config.h"
 
-
 //===============================================================
 // Defines
 //===============================================================
@@ -25,7 +24,6 @@
 #define KEY_FLOW_LIQUID1      "FlowLiquid1"   // Key name: Maximum string length is 15 bytes, excluding a zero terminator.
 #define KEY_FLOW_LIQUID2      "FlowLiquid2"   // Key name: Maximum string length is 15 bytes, excluding a zero terminator.
 #define KEY_FLOW_LIQUID3      "FlowLiquid3"   // Key name: Maximum string length is 15 bytes, excluding a zero terminator.
-
 
 //===============================================================
 // Class for flow measuring
@@ -66,11 +64,9 @@ class FlowMeterDriver
     bool _isSavePending = false;
 };
 
-
 //===============================================================
 // Global variables
 //===============================================================
 extern FlowMeterDriver FlowMeter;
-
 
 #endif

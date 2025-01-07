@@ -25,7 +25,6 @@
 #include "AngleHelper.h"
 #include "FlowMeterDriver.h"
 
-
 //===============================================================
 // Defines
 //===============================================================
@@ -61,7 +60,6 @@
 #define SPACERANGLE_DEGREES         1  // Angle which will be displayed as spacer between pie elements (will be multiplied by 2, left and right of the setting angle)
 
 #define SCREENSAVER_STARCOUNT       30
-
 
 //===============================================================
 // Icons
@@ -175,7 +173,6 @@ class Star
     int16_t MaxSize = 0;
     bool FullStars = false;
 };
-
 
 //===============================================================
 // Class for handling display functions
@@ -325,11 +322,9 @@ class DisplayDriver
     void DrawStarTail(int16_t x0, int16_t y0, int16_t start, int16_t end, bool fullStars, uint16_t color);
 };
 
-
 //===============================================================
 // Global variables
 //===============================================================
 extern DisplayDriver Display;
-
 
 #endif

@@ -27,7 +27,7 @@
  * causes the Wemos S2 Mini to report as a COM interface immediately
  * after booting via USB. This means that the microcontroller can
  * be programmed via the Arduino Ide WITHOUT having to press the 
- * "BOOT" and "RESET" buttons again. (This allows the housing of
+ * "BOOT" and "RESET" buttons again. (This allows the housing
  * to remain closed).
  * 
  * ==============================================================
@@ -87,7 +87,6 @@
 
 // Intro defines
 #define INTRO_TIME_MS           3000  // Wait for 3 seconds at startup and show intro page
-
 
 //===============================================================
 // Global variables

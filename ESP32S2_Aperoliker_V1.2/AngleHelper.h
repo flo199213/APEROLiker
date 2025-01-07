@@ -15,13 +15,11 @@
 #include <Arduino.h>
 #include "Config.h"
 
-
 //===============================================================
 // Defines
 //===============================================================
 #define STEPANGLE_DEGREES       3     // Angle which will be used for one encoder step
 #define MINANGLE_DEGREES        6     // Minimum distance angle between two angle settings
-
 
 //===============================================================
 // Declarations
@@ -35,6 +33,5 @@ int16_t Move360(int16_t value, int16_t distance);
 
 // Return the clockwise distance between two angles in an 360° space
 int16_t GetDistanceDegrees(int16_t startAngle, int16_t stopAngle);
-
 
 #endif

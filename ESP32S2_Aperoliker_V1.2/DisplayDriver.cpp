@@ -6,6 +6,9 @@
  * @copyright © 2024 Florian Staeblein
  */
 
+//===============================================================
+// Includes
+//===============================================================
 #include "DisplayDriver.h"
 
 //===============================================================
@@ -692,7 +695,7 @@ void DisplayDriver::DrawDoughnutChart3()
 // Draws doughnut chart
 //===============================================================
 void DisplayDriver::DrawDoughnutChart3(bool clockwise, bool isfullUpdate)
-{ 
+{
   if (isfullUpdate)
   {
     // Calculate count of draw_Angle's to draw

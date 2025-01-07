@@ -16,7 +16,6 @@
 #include "Config.h"
 #include "FlowMeterDriver.h"
 
-
 //===============================================================
 // Defines
 //===============================================================
@@ -25,7 +24,6 @@
 #define MAX_CYCLE_TIMESPAN_MS         (uint32_t)1000
 
 #define KEY_CYCLETIMESPAN_MS          "CycleTimespan" // Key name: Maximum string length is 15 bytes, excluding a zero terminator.
-
 
 //===============================================================
 // Class for handling pump driver functions
@@ -100,7 +98,6 @@ class PumpDriver
     // Disables pump output (internal)
     void DisableInternal();
 };
-
 
 //===============================================================
 // Global variables

@@ -21,7 +21,6 @@
 //===============================================================
 #define MINIMUMLONGTIMEPRESS_MS   500
 
-
 //===============================================================
 // Class for handling encoder and button functions
 //===============================================================
@@ -77,11 +76,9 @@ class EncoderButtonDriver
     uint32_t _lastUserAction = 0;
 };
 
-
 //===============================================================
 // Global variables
 //===============================================================
 extern EncoderButtonDriver EncoderButton;
-
 
 #endif

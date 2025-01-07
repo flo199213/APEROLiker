@@ -22,12 +22,10 @@
 #include "FlowMeterDriver.h"
 #include "WifiHandler.h"
 
-
 //===============================================================
 // Defines
 //===============================================================
 #define SCREENSAVER_TIMEOUT_MS      30000     // 30 seconds
-
 
 //===============================================================
 // Class for state machine handling
@@ -129,11 +127,9 @@ class StateMachine
     void UpdateValues(uint32_t clientID = 0);
 };
 
-
 //===============================================================
 // Global variables
 //===============================================================
 extern StateMachine Statemachine;
-
 
 #endif

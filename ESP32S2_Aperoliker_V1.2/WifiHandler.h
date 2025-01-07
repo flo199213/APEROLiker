@@ -24,14 +24,11 @@
 #include "SystemHelper.h"
 #include "StateMachine.h"
 
-
 #if defined(WIFI_MIXER)
-
 //===============================================================
 // Defines
 //===============================================================
 #define KEY_WIFIMODE      "WifiMode"   // Key name: Maximum string length is 15 bytes, excluding a zero terminator.
-
 
 //===============================================================
 // Class for wifi handling
@@ -102,12 +99,10 @@ class WifiHandler
     void UpdateSettingsToClient(AsyncWebSocketClient* client);
 };
 
-
 //===============================================================
 // Global variables
 //===============================================================
 extern WifiHandler Wifihandler;
-
 
 #endif
 #endif
