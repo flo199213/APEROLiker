@@ -1,3 +1,5 @@
+### This repository is outdated. You can use the latest version from the new CocktailCube project. The new firmware is downward compatible with the self-built APEROLiker hardware: https://github.com/flo199213/CocktailCube
+
 # APEROLiker / HUGOliker / WINEBar
 Sourcecode for APEROLiker/HUGOliker/WINEBar Devices powered by ESP32S2 (Wemos S2 Mini)
 
